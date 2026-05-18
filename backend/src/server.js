@@ -16,6 +16,20 @@ async function startServer() {
   await connectDB();
   await User.updateMany({ linkedinUrl: '' }, { $unset: { linkedinUrl: '' } });
   await User.updateMany({ linkedinUrl: null }, { $unset: { linkedinUrl: '' } });
+  await User.updateMany({ googleId: null }, { $unset: { googleId: '' } });
+  await User.updateMany({ linkedinId: null }, { $unset: { linkedinId: '' } });
+
+  try {
+    await User.collection.dropIndex('googleId_1');
+  } catch {
+    // The old index may not exist on fresh databases.
+  }
+
+  try {
+    await User.collection.dropIndex('linkedinId_1');
+  } catch {
+    // The old index may not exist on fresh databases.
+  }
 
   try {
     await User.collection.dropIndex('linkedinUrl_1');

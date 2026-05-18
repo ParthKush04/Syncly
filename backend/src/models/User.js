@@ -24,14 +24,14 @@ const userSchema = new mongoose.Schema(
       trim: true,
       unique: true,
       sparse: true,
-      default: null
+      default: undefined
     },
     linkedinId: {
       type: String,
       trim: true,
       unique: true,
       sparse: true,
-      default: null
+      default: undefined
     },
     profileImage: {
       type: String,
