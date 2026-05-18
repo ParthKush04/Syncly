@@ -23,7 +23,26 @@ export async function createApp() {
       .filter(Boolean)
   );
 
-  app.use(helmet());
+  // Strengthen security headers to prevent Chrome Safe Browsing blocks
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:', 'https:', 'https://media-exp1.licdn.com', 'https://lh3.googleusercontent.com'],
+        connectSrc: ["'self'", 'https://www.linkedin.com', 'https://api.linkedin.com'],
+        frameSrc: ["'self'", 'https://www.linkedin.com', 'https://accounts.google.com'],
+        baseUri: ["'self'"],
+        formAction: ["'self'", 'https://www.linkedin.com', 'https://accounts.google.com']
+      }
+    },
+    hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    noSniff: true,
+    xssFilter: true
+  }));
+
   app.use(
     cors({
       origin(origin, callback) {
@@ -34,7 +53,9 @@ export async function createApp() {
 
         return callback(new Error(`CORS origin not allowed: ${origin}`));
       },
-      credentials: true
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization']
     })
   );
   app.use(express.json());

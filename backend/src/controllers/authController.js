@@ -51,7 +51,15 @@ export function googleAuthFailure(req, res) {
 export async function linkedinCallback(req, res, next) {
   try {
     if (req.query.error) {
-      return res.redirect(`${process.env.CLIENT_URL || 'https://syncly-six.vercel.app'}/login?error=linkedin`);
+      // Don't redirect with error, return JSON first
+      console.error('LinkedIn OAuth error:', req.query.error, req.query.error_description);
+      const clientUrl = process.env.CLIENT_URL || 'https://syncly-six.vercel.app';
+      return res.redirect(`${clientUrl}/login?error=linkedin&details=${encodeURIComponent(req.query.error_description || 'Unknown error')}`);
+    }
+
+    if (!req.query.code) {
+      const clientUrl = process.env.CLIENT_URL || 'https://syncly-six.vercel.app';
+      return res.redirect(`${clientUrl}/login?error=linkedin&details=No authorization code`);
     }
 
     const { profile } = await exchangeLinkedInCallback(req);
@@ -61,7 +69,9 @@ export async function linkedinCallback(req, res, next) {
 
     return res.redirect(buildAuthSuccessRedirect(token));
   } catch (error) {
-    return next(error);
+    console.error('LinkedIn callback error:', error.message);
+    const clientUrl = process.env.CLIENT_URL || 'https://syncly-six.vercel.app';
+    return res.redirect(`${clientUrl}/login?error=linkedin&details=${encodeURIComponent(error.message || 'Authentication failed')}`);
   }
 }
 
