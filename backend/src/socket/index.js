@@ -4,7 +4,7 @@ import { initializeMatchmaking } from './matchmaking.js';
 export function initializeSocket(httpServer) {
   const io = new Server(httpServer, {
     cors: {
-      origin: process.env.CLIENT_URL || 'http://localhost:5173',
+      origin: process.env.CLIENT_URL || 'https://syncly-six.vercel.app',
       credentials: true
     }
   });

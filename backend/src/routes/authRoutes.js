@@ -23,7 +23,7 @@ router.get(
 router.get(
   '/google/callback',
   passport.authenticate('google', {
-    failureRedirect: `${process.env.CLIENT_URL || 'http://localhost:5173'}/login`,
+    failureRedirect: `${process.env.CLIENT_URL || 'https://syncly-six.vercel.app'}/login`,
     session: true
   }),
   googleAuthSuccess

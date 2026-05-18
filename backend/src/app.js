@@ -13,10 +13,27 @@ import { configurePassport } from './config/passport.js';
 export async function createApp() {
   const app = express();
 
+  // Required on Render/other proxies so secure cookies and session handling work correctly.
+  app.set('trust proxy', 1);
+
+  const allowedOrigins = new Set(
+    String(process.env.CLIENT_URL || 'https://syncly-six.vercel.app')
+      .split(',')
+      .map((origin) => origin.trim())
+      .filter(Boolean)
+  );
+
   app.use(helmet());
   app.use(
     cors({
-      origin: process.env.CLIENT_URL || 'http://localhost:5173',
+      origin(origin, callback) {
+        // Allow non-browser tools (no Origin header) and configured browser origins.
+        if (!origin || allowedOrigins.has(origin)) {
+          return callback(null, true);
+        }
+
+        return callback(new Error(`CORS origin not allowed: ${origin}`));
+      },
       credentials: true
     })
   );

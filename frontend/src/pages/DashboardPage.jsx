@@ -62,7 +62,7 @@ export default function DashboardPage() {
 
   const handleSignOut = async () => {
     try {
-      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/logout`, {
+      await fetch(`${import.meta.env.VITE_API_URL || 'https://syncly-3nm4.onrender.com'}/api/auth/logout`, {
         method: 'POST',
         credentials: 'include'
       });

@@ -11,6 +11,12 @@ function setAuthCookie(res, token) {
   });
 }
 
+function buildAuthSuccessRedirect(token) {
+  const clientUrl = process.env.CLIENT_URL || 'https://syncly-six.vercel.app';
+  // Use URL hash so token is not sent back to the server in request logs.
+  return `${clientUrl}/auth/success#token=${encodeURIComponent(token)}`;
+}
+
 export function googleAuthSuccess(req, res) {
   if (!req.user) {
     return res.status(401).json({ message: 'Google authentication failed' });
@@ -19,7 +25,7 @@ export function googleAuthSuccess(req, res) {
   const token = generateToken(req.user._id);
   setAuthCookie(res, token);
 
-  return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/auth/success`);
+  return res.redirect(buildAuthSuccessRedirect(token));
 }
 
 export async function linkedinLogin(req, res, next) {
@@ -45,7 +51,7 @@ export function googleAuthFailure(req, res) {
 export async function linkedinCallback(req, res, next) {
   try {
     if (req.query.error) {
-      return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/login?error=linkedin`);
+      return res.redirect(`${process.env.CLIENT_URL || 'https://syncly-six.vercel.app'}/login?error=linkedin`);
     }
 
     const { profile } = await exchangeLinkedInCallback(req);
@@ -53,7 +59,7 @@ export async function linkedinCallback(req, res, next) {
     const token = generateToken(user._id);
     setAuthCookie(res, token);
 
-    return res.redirect(`${process.env.CLIENT_URL || 'http://localhost:5173'}/auth/success`);
+    return res.redirect(buildAuthSuccessRedirect(token));
   } catch (error) {
     return next(error);
   }

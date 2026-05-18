@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://syncly-3nm4.onrender.com';
 
 export default function AuthSuccessPage() {
   const navigate = useNavigate();
@@ -13,9 +13,23 @@ export default function AuthSuccessPage() {
 
     async function finalizeAuth() {
       try {
+        const hashParams = new URLSearchParams(window.location.hash.startsWith('#') ? window.location.hash.slice(1) : '');
+        const tokenFromHash = hashParams.get('token');
+
+        if (tokenFromHash) {
+          localStorage.setItem('synclyToken', tokenFromHash);
+          // Clean token from URL after persisting it.
+          window.history.replaceState(null, '', '/auth/success');
+        }
+
         const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
           method: 'GET',
-          credentials: 'include'
+          credentials: 'include',
+          headers: tokenFromHash
+            ? {
+                Authorization: `Bearer ${tokenFromHash}`
+              }
+            : undefined
         });
 
         if (!response.ok) {

@@ -46,7 +46,7 @@ export async function buildLinkedInLoginUrl(req) {
 
   const parameters = new URLSearchParams({
     response_type: 'code',
-    redirect_uri: process.env.LINKEDIN_CALLBACK_URL || 'http://localhost:5000/api/auth/linkedin/callback',
+    redirect_uri: process.env.LINKEDIN_CALLBACK_URL || 'https://syncly-3nm4.onrender.com/api/auth/linkedin/callback',
     scope: linkedInScopes.join(' '),
     state
   });
@@ -120,7 +120,7 @@ export async function exchangeLinkedInCallback(req) {
   const tokenBody = new URLSearchParams({
     grant_type: 'authorization_code',
     code,
-    redirect_uri: process.env.LINKEDIN_CALLBACK_URL || 'http://localhost:5000/api/auth/linkedin/callback',
+    redirect_uri: process.env.LINKEDIN_CALLBACK_URL || 'https://syncly-3nm4.onrender.com/api/auth/linkedin/callback',
     client_id: process.env.LINKEDIN_CLIENT_ID,
     client_secret: process.env.LINKEDIN_CLIENT_SECRET
   });
