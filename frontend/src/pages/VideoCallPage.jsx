@@ -1,0 +1,146 @@
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import CallHeader from '../components/videoCall/CallHeader.jsx';
+import VideoPane from '../components/videoCall/VideoPane.jsx';
+import CallControls from '../components/videoCall/CallControls.jsx';
+import VideoRoom from '../components/video/VideoRoom.jsx';
+import { useStreamVideoSession } from '../context/StreamVideoSessionContext.jsx';
+
+function formatTime(seconds) {
+  const minutes = String(Math.floor(seconds / 60)).padStart(2, '0');
+  const remainingSeconds = String(seconds % 60).padStart(2, '0');
+  return `${minutes}:${remainingSeconds}`;
+}
+
+export default function VideoCallPage() {
+  const [searchParams] = useSearchParams();
+  const { startSession, joinCall, status, error, isConnected, isInCall, setCallId, setCallType } = useStreamVideoSession();
+  const [isMuted, setIsMuted] = useState(false);
+  const [isCameraOff, setIsCameraOff] = useState(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+
+  useEffect(() => {
+    const userJson = localStorage.getItem('synclyUser');
+
+    if (!userJson) {
+      return undefined;
+    }
+
+    const callId = searchParams.get('callId') || searchParams.get('sessionId') || 'professional-networking-room';
+    const callType = searchParams.get('callType') || 'default';
+
+    try {
+      const user = JSON.parse(userJson);
+      const identity = {
+        userId: String(user._id || user.id || user.email || '').trim(),
+        name: String(user.fullName || user.name || 'User').trim(),
+        image: String(user.profileImage || user.photoUrl || '').trim()
+      };
+
+      setCallId(callId);
+      setCallType(callType);
+
+      if (!isConnected) {
+        startSession(identity).then((nextClient) => {
+          if (nextClient) {
+            joinCall({ callId, callType }, nextClient);
+          }
+        });
+      } else if (!isInCall) {
+        joinCall({ callId, callType });
+      }
+    } catch {
+      // Ignore malformed cached profile and fall back to the manual lobby.
+    }
+  }, [isConnected, isInCall, joinCall, searchParams, setCallId, setCallType, startSession]);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setElapsedSeconds((current) => current + 1);
+    }, 1000);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
+
+  const sessionTime = useMemo(() => formatTime(elapsedSeconds), [elapsedSeconds]);
+
+  const handleLeave = () => {
+    setElapsedSeconds(0);
+    setIsMuted(false);
+    setIsCameraOff(false);
+  };
+
+  return (
+    <main className="min-h-screen px-4 py-6 text-slate-900 sm:px-6 lg:px-10 lg:py-8">
+      <div className="mx-auto grid max-w-7xl gap-6">
+        <CallHeader sessionTime={sessionTime} connectionStatus={isInCall ? 'Connected' : status} roomName="Professional video call" />
+
+        <section className="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(320px,0.8fr)]">
+          <div className="grid gap-6">
+            <VideoRoom />
+
+            <div className="grid gap-6 sm:grid-cols-2">
+              <VideoPane title="Your camera" subtitle="Previewing local audio and video" accent="emerald" isLocal={true} />
+
+              <aside className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-lg shadow-slate-200/80 backdrop-blur-xl">
+                <p className="text-sm uppercase tracking-[0.35em] text-cyan-700">Session details</p>
+                <div className="mt-4 space-y-3 text-sm text-slate-600">
+                  <InfoRow label="Session timer" value={sessionTime} />
+                  <InfoRow label="Status" value={isMuted ? 'Muted' : 'Speaking'} />
+                  <InfoRow label="Camera" value={isCameraOff ? 'Off' : 'On'} />
+                  <InfoRow label="Connection" value="Stable" />
+                </div>
+              </aside>
+            </div>
+          </div>
+
+          <div className="grid gap-6 self-start">
+            <section className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-2xl shadow-slate-200/80 backdrop-blur-xl">
+              <p className="text-sm uppercase tracking-[0.35em] text-cyan-700">Call summary</p>
+              <h2 className="mt-3 text-2xl font-semibold text-slate-900">Focused, premium communication</h2>
+              <p className="mt-3 text-sm leading-7 text-slate-600">
+                Keep the conversation centered with a clear visual hierarchy, strong contrast, and controls that feel natural on every screen size.
+              </p>
+
+              <div className="mt-5 grid gap-3">
+                <MiniStat label="Local stream" value={isInCall ? 'Ready' : 'Connecting'} />
+                <MiniStat label="Remote stream" value={isInCall ? 'Live' : 'Waiting'} />
+                <MiniStat label="Call duration" value={sessionTime} />
+              </div>
+            </section>
+
+            <CallControls
+              isMuted={isMuted}
+              isCameraOff={isCameraOff}
+              onToggleMute={() => setIsMuted((current) => !current)}
+              onToggleCamera={() => setIsCameraOff((current) => !current)}
+              onLeave={handleLeave}
+            />
+
+            <div className="rounded-[2rem] border border-cyan-100 bg-cyan-50 p-5 text-sm leading-7 text-cyan-900">
+              {error || 'Tip: matchmaking now routes into the real Stream video flow, so a match can open an actual call session.'}
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  );
+}
+
+function InfoRow({ label, value }) {
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+      <span className="text-slate-500">{label}</span>
+      <span className="font-semibold text-slate-900">{value}</span>
+    </div>
+  );
+}
+
+function MiniStat({ label, value }) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+      <p className="text-xs uppercase tracking-[0.25em] text-slate-500">{label}</p>
+      <p className="mt-2 text-base font-semibold text-slate-900">{value}</p>
+    </div>
+  );
+}
