@@ -112,6 +112,21 @@ a {
   }
 }
 
+/* Dark glass card used site-wide to replace light white panels */
+.card-dark {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #ffffff;
+  backdrop-filter: blur(10px);
+}
+
+.card-dark-strong {
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #ffffff;
+  backdrop-filter: blur(12px);
+}
+
 .animate-spin-slow {
   animation: spin-slow 10s linear infinite;
 }

@@ -177,10 +177,10 @@ export default function MatchmakingWaitPage() {
   }, [navigate]);
 
   return (
-    <main className="min-h-screen px-4 py-8 text-slate-900 sm:px-6 lg:px-10 lg:py-10">
+    <main className="min-h-screen px-4 py-8 text-white sm:px-6 lg:px-10 lg:py-10">
       <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-        <section className="rounded-[2rem] border border-slate-200 bg-white/90 p-6 shadow-2xl shadow-slate-200/80 backdrop-blur-xl sm:p-8">
-          <Logo compact className="mb-5" />
+        <section className="rounded-[2rem] card-dark-strong p-6 shadow-2xl shadow-black/30 sm:p-8">
+          <Logo compact className="mb-5" tone="light" />
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-sm uppercase tracking-[0.35em] text-cyan-700">Matchmaking queue</p>
@@ -192,23 +192,23 @@ export default function MatchmakingWaitPage() {
             </div>
           </div>
 
-          <div className="mt-8 grid place-items-center rounded-[2rem] border border-slate-200 bg-slate-50 p-6">
+          <div className="mt-8 grid place-items-center rounded-[2rem] card-dark p-6">
             <SearchingOrb />
           </div>
 
-          <div className="mt-6 rounded-3xl border border-slate-200 bg-slate-50 p-5">
-            <div className="flex items-center justify-between gap-4 text-sm text-slate-600">
+          <div className="mt-6 rounded-3xl card-dark p-5">
+            <div className="flex items-center justify-between gap-4 text-sm text-white/80">
               <span>{errorMessage || statusMessage || progressMessages[messageIndex]}</span>
               <span>{progress}%</span>
             </div>
-            <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/6">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-700"
                 style={{ width: `${progress}%` }}
               />
             </div>
-            {queueSize !== null ? <p className="mt-3 text-xs uppercase tracking-[0.3em] text-slate-500">Queue size: {queueSize}</p> : null}
-            {matchPartner ? <p className="mt-3 text-sm font-medium text-emerald-700">Matched with {matchPartner?.fullName || 'a professional'}</p> : null}
+            {queueSize !== null ? <p className="mt-3 text-xs uppercase tracking-[0.3em] text-white/60">Queue size: {queueSize}</p> : null}
+            {matchPartner ? <p className="mt-3 text-sm font-medium text-emerald-300">Matched with {matchPartner?.fullName || 'a professional'}</p> : null}
           </div>
         </section>
 
