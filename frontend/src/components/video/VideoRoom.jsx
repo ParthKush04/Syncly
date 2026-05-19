@@ -88,7 +88,7 @@ export default function VideoRoom() {
             </StreamTheme>
           </StreamCall>
         ) : (
-          <WaitingPanel onJoin={joinCall} joining={status === 'joining'} />
+          <WaitingPanel onJoin={() => joinCall()} joining={status === 'joining'} />
         )}
       </StreamVideo>
     </section>

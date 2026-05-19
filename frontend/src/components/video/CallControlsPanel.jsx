@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { useCall, useCallStateHooks } from '@stream-io/video-react-sdk';
 
 function ToggleButton({ active, label, onClick }) {
@@ -22,16 +22,38 @@ export default function CallControlsPanel({ onLeave }) {
   const { useCameraState, useMicrophoneState } = useCallStateHooks();
   const { camera, isMute: isCameraMuted } = useCameraState();
   const { microphone, isMute: isMicrophoneMuted } = useMicrophoneState();
+  const leavingRef = useRef(false);
 
   const handleLeave = useCallback(async () => {
+    if (leavingRef.current) {
+      return;
+    }
+
+    leavingRef.current = true;
+
     if (onLeave) {
-      await onLeave();
+      try {
+        await onLeave();
+      } catch (error) {
+        console.error('[stream-session] onLeave handler failed', error);
+      } finally {
+        leavingRef.current = false;
+      }
       return;
     }
 
     if (call) {
-      await call.leave();
+      try {
+        await call.leave();
+      } catch (error) {
+        const message = String(error?.message || error || '').toLowerCase();
+        if (!message.includes('already been left')) {
+          console.error('[stream-session] call.leave from controls failed', error);
+        }
+      }
     }
+
+    leavingRef.current = false;
   }, [call, onLeave]);
 
   return (

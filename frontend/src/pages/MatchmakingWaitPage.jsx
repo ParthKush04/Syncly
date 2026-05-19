@@ -24,6 +24,8 @@ export default function MatchmakingWaitPage() {
   const navigate = useNavigate();
   const socketRef = useRef(null);
   const hasMountedRef = useRef(false);
+  const hasNavigatedToCallRef = useRef(false);
+  const hasLeftQueueRef = useRef(false);
   const timeoutRef = useRef(null);
   const [messageIndex, setMessageIndex] = useState(0);
   const [progress, setProgress] = useState(18);
@@ -43,93 +45,111 @@ export default function MatchmakingWaitPage() {
 
   useEffect(() => {
     const token = localStorage.getItem('synclyToken');
+    const userJson = localStorage.getItem('synclyUser');
+    const authUserId = (() => {
+      if (!userJson) {
+        return '';
+      }
 
-    if (!token) {
+      try {
+        return String(JSON.parse(userJson)?._id || '').trim();
+      } catch {
+        return '';
+      }
+    })();
+
+    console.log('[matchmaking] auth/token readiness', {
+      hasToken: Boolean(token),
+      authUserId,
+      ready: Boolean(token && authUserId)
+    });
+
+    if (!token || !authUserId) {
       setErrorMessage('Please sign in again before entering matchmaking.');
       setStatusMessage('Authentication required');
       return undefined;
     }
 
+    hasNavigatedToCallRef.current = false;
+    hasLeftQueueRef.current = false;
+
     const socket = createMatchmakingSocket(token);
     socketRef.current = socket;
     hasMountedRef.current = true;
-      const navigateOnceRef = { current: false };
 
-    socket.on('connect', () => {
+    const navigateToCall = (sessionId, delayMs = 600) => {
+      if (hasNavigatedToCallRef.current) {
+        return;
+      }
+
+      hasNavigatedToCallRef.current = true;
+
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = window.setTimeout(() => {
+        const nextUrl = sessionId ? `/call?sessionId=${encodeURIComponent(sessionId)}` : '/call';
+        console.log('[matchmaking] navigating to call', { nextUrl });
+        navigate(nextUrl);
+      }, delayMs);
+    };
+
+    const handleConnect = () => {
       console.log('[matchmaking] socket connected', socket.id);
       setStatusMessage('Connected to matchmaking queue');
       console.log('[matchmaking] emitting matchmaking:join');
       socket.emit('matchmaking:join');
-    });
+    };
+    socket.on('connect', handleConnect);
 
-    socket.on('connect_error', (error) => {
+    const handleConnectError = (error) => {
       console.error('[matchmaking] socket connect_error', error);
       setErrorMessage(error?.message || 'Failed to connect to matchmaking');
       setStatusMessage('Connection error');
-    });
+    };
+    socket.on('connect_error', handleConnectError);
 
-    socket.on('matchmaking:queued', (payload) => {
+    const handleQueued = (payload) => {
       console.log('[matchmaking] queued payload', payload);
       setStatusMessage(payload?.message || 'You joined the matchmaking queue');
       setQueueSize(payload?.queueSize ?? null);
-    });
+    };
+    socket.on('matchmaking:queued', handleQueued);
 
-    socket.on('matchmaking:matched', (payload) => {
+    const handleMatched = (payload) => {
       console.log('[matchmaking] matched payload', payload);
       setStatusMessage('Match found');
       setMatchPartner(payload?.partner || null);
       const sessionId = payload?.sessionId || payload?.roomId;
+      navigateToCall(sessionId, 600);
+    };
+    socket.on('matchmaking:matched', handleMatched);
 
-      if (timeoutRef.current) {
-        window.clearTimeout(timeoutRef.current);
-      }
-
-      if (sessionId && !navigateOnceRef.current) {
-        navigateOnceRef.current = true;
-        timeoutRef.current = window.setTimeout(() => {
-          navigate(`/call?sessionId=${encodeURIComponent(sessionId)}`);
-        }, 800);
-        return;
-      }
-
-      timeoutRef.current = window.setTimeout(() => {
-        if (!navigateOnceRef.current) {
-          navigate('/call');
-        }
-      }, 1200);
-    });
-
-    // New: listen for explicit 'match-found' events from the server and redirect to the shared video room
-    socket.on('match-found', (payload) => {
+    const handleMatchFound = (payload) => {
       console.log('[matchmaking] received match-found payload', payload);
       setStatusMessage('Match found');
       setMatchPartner(payload?.partner || null);
       const sessionId = payload?.sessionId || payload?.roomId;
+      navigateToCall(sessionId, 500);
+    };
+    socket.on('match-found', handleMatchFound);
 
-      if (timeoutRef.current) {
-        window.clearTimeout(timeoutRef.current);
-      }
-
-      if (sessionId && !navigateOnceRef.current) {
-        navigateOnceRef.current = true;
-        timeoutRef.current = window.setTimeout(() => {
-          navigate(`/call?sessionId=${encodeURIComponent(sessionId)}`);
-        }, 500);
-      }
-    });
-
-    socket.on('matchmaking:error', (payload) => {
+    const handleMatchmakingError = (payload) => {
       console.error('[matchmaking] matchmaking:error', payload);
       setErrorMessage(payload?.message || 'Unable to join matchmaking');
       setStatusMessage('Queue error');
-    });
+    };
+    socket.on('matchmaking:error', handleMatchmakingError);
 
-    socket.on('disconnect', () => {
+    const handleDisconnect = (reason) => {
       console.log('[matchmaking] socket disconnected');
-      if (hasMountedRef.current && !matchPartner) {
+      if (hasMountedRef.current && !hasNavigatedToCallRef.current) {
         setStatusMessage('Disconnected from queue');
       }
-    });
+      console.log('[matchmaking] disconnect reason', reason);
+    };
+    socket.on('disconnect', handleDisconnect);
 
     return () => {
       hasMountedRef.current = false;
@@ -138,27 +158,23 @@ export default function MatchmakingWaitPage() {
         window.clearTimeout(timeoutRef.current);
       }
 
-      if (socket.connected) {
+      if (socket.connected && !hasLeftQueueRef.current && !hasNavigatedToCallRef.current) {
+        hasLeftQueueRef.current = true;
+        console.log('[matchmaking] emitting matchmaking:leave');
         socket.emit('matchmaking:leave');
       }
 
-      socket.removeAllListeners();
+      socket.off('connect', handleConnect);
+      socket.off('connect_error', handleConnectError);
+      socket.off('matchmaking:queued', handleQueued);
+      socket.off('matchmaking:matched', handleMatched);
+      socket.off('match-found', handleMatchFound);
+      socket.off('matchmaking:error', handleMatchmakingError);
+      socket.off('disconnect', handleDisconnect);
       socket.disconnect();
       socketRef.current = null;
     };
   }, [navigate]);
-
-  useEffect(() => {
-    if (!matchPartner) {
-      return undefined;
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      navigate('/call');
-    }, 1200);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [matchPartner, navigate]);
 
   return (
     <main className="min-h-screen px-4 py-8 text-slate-900 sm:px-6 lg:px-10 lg:py-10">

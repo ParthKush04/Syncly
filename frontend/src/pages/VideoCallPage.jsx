@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import CallHeader from '../components/videoCall/CallHeader.jsx';
 import VideoPane from '../components/videoCall/VideoPane.jsx';
@@ -14,45 +14,74 @@ function formatTime(seconds) {
 
 export default function VideoCallPage() {
   const [searchParams] = useSearchParams();
-  const { startSession, joinCall, status, error, isConnected, isInCall, setCallId, setCallType } = useStreamVideoSession();
+  const { ensureSessionAndJoin, status, error, setError, isInCall, setCallId, setCallType } = useStreamVideoSession();
   const [isMuted, setIsMuted] = useState(false);
   const [isCameraOff, setIsCameraOff] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const lastJoinKeyRef = useRef('');
 
   useEffect(() => {
+    const token = localStorage.getItem('synclyToken');
     const userJson = localStorage.getItem('synclyUser');
 
-    if (!userJson) {
+    if (!token || !userJson) {
+      setError('Authentication is missing. Please sign in again.');
       return undefined;
     }
 
     const callId = searchParams.get('callId') || searchParams.get('sessionId') || 'professional-networking-room';
     const callType = searchParams.get('callType') || 'default';
+    let cancelled = false;
 
     try {
       const user = JSON.parse(userJson);
+      const authUserId = String(user?._id || '').trim();
+
+      if (!authUserId) {
+        setError('Authenticated user id is missing. Please sign in again.');
+        return undefined;
+      }
+
       const identity = {
-        userId: String(user._id || user.id || user.email || '').trim(),
+        userId: authUserId,
         name: String(user.fullName || user.name || 'User').trim(),
         image: String(user.profileImage || user.photoUrl || '').trim()
       };
 
+      const joinKey = `${identity.userId}:${callType}:${callId}`;
+      if (lastJoinKeyRef.current === joinKey) {
+        return undefined;
+      }
+
+      lastJoinKeyRef.current = joinKey;
+
+      console.log('[video-call] auth/token readiness', {
+        hasToken: Boolean(token),
+        userId: identity.userId,
+        callType,
+        callId
+      });
+
       setCallId(callId);
       setCallType(callType);
 
-      if (!isConnected) {
-        startSession(identity).then((nextClient) => {
-          if (nextClient) {
-            joinCall({ callId, callType }, nextClient);
-          }
-        });
-      } else if (!isInCall) {
-        joinCall({ callId, callType });
-      }
+      void ensureSessionAndJoin({
+        identity,
+        callId,
+        callType
+      }).then((joined) => {
+        if (!joined && !cancelled) {
+          lastJoinKeyRef.current = '';
+        }
+      });
     } catch {
-      // Ignore malformed cached profile and fall back to the manual lobby.
+      setError('Cached user data is invalid. Please sign in again.');
     }
-  }, [isConnected, isInCall, joinCall, searchParams, setCallId, setCallType, startSession]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [ensureSessionAndJoin, searchParams, setCallId, setCallType, setError]);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {

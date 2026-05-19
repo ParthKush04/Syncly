@@ -6,7 +6,7 @@ export function createMatchmakingSocket(token) {
   return io(SOCKET_URL, {
     withCredentials: true,
     auth: token ? { token } : undefined,
-    transports: ['polling'],
-    upgrade: false
+    transports: ['websocket', 'polling'],
+    upgrade: true
   });
 }
