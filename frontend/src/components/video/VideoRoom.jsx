@@ -96,8 +96,8 @@ function VideoFrame({
 
   const sizeClass =
     size === 'preview'
-      ? 'aspect-[4/5] w-full min-h-[12rem] sm:aspect-video sm:min-h-[13rem] md:min-h-[15rem]'
-      : 'aspect-[4/5] w-full min-h-[22rem] sm:aspect-video sm:min-h-[26rem] md:min-h-[30rem] lg:min-h-[36rem]';
+      ? 'aspect-[4/5] w-full min-h-[11rem] sm:aspect-video sm:min-h-[13rem] md:min-h-[15rem]'
+      : 'aspect-[4/5] w-full min-h-[16rem] sm:aspect-video sm:min-h-[24rem] md:min-h-[30rem] lg:min-h-[36rem]';
 
   return (
     <div
@@ -226,7 +226,8 @@ function StageContent({
   selfParticipant,
   status,
   onJoin,
-  joining
+  joining,
+  isMobile
 }) {
   if (!participants.length) {
     return (
@@ -239,10 +240,12 @@ function StageContent({
   }
 
   return (
-    <TwoPersonLayout
-      primaryParticipant={primaryParticipant}
-      selfParticipant={selfParticipant}
-    />
+    <div className={isMobile ? 'flex flex-col gap-3' : ''}>
+      <TwoPersonLayout
+        primaryParticipant={primaryParticipant}
+        selfParticipant={selfParticipant}
+      />
+    </div>
   );
 }
 
@@ -271,6 +274,8 @@ function VideoStage({
 
   const callingState = useCallCallingState ? useCallCallingState() : null;
   const isAutoplayBlocked = useIsAutoplayBlocked ? useIsAutoplayBlocked() : false;
+  const viewportWidth = useViewportWidth();
+  const isMobile = viewportWidth > 0 && viewportWidth < 768;
 
   const handleResumeAudio = useCallback(() => {
     void call?.resumeAudio?.();
@@ -292,7 +297,7 @@ function VideoStage({
   }, [localParticipant, remoteParticipants]);
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col gap-3">
+    <div className="flex h-full min-h-0 w-full flex-col gap-3 overflow-y-auto pb-2 md:overflow-hidden">
       <VideoStageHeader
         status={callingState || status}
         participantCount={participants.length}
@@ -319,8 +324,11 @@ function VideoStage({
           status={callingState || status}
           onJoin={onJoin}
           joining={joining}
+          isMobile={isMobile}
         />
       </div>
+
+      {isMobile ? <div className="h-2 shrink-0" /> : null}
     </div>
   );
 }
