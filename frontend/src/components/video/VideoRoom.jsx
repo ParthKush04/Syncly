@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ParticipantView, StreamCall, StreamTheme, StreamVideo, useCallStateHooks, useDominantSpeaker } from '@stream-io/video-react-sdk';
+import { ParticipantView, StreamCall, StreamTheme, StreamVideo, useCallStateHooks } from '@stream-io/video-react-sdk';
 import { useStreamVideoSession } from '../../context/StreamVideoSessionContext.jsx';
 
 function useViewportWidth() {
@@ -181,7 +181,7 @@ function VideoStage({ status }) {
   const { useParticipants, useCallCallingState } = useCallStateHooks();
   const participants = useParticipants();
   const callingState = useCallCallingState();
-  const dominantSpeaker = useDominantSpeaker();
+  const dominantSpeaker = participants.find((p) => p.isDominantSpeaker) || null;
   const viewportWidth = useViewportWidth();
   const isMobile = viewportWidth > 0 && viewportWidth < 768;
 
