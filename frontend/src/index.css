@@ -4,8 +4,8 @@
 
 :root {
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-  color: #0f172a;
-  background: #f8fafc;
+  color: #ffffff;
+  background: #020617;
 }
 
 html,
@@ -17,10 +17,12 @@ body,
 
 body {
   background:
-    radial-gradient(circle at top, rgba(34, 211, 238, 0.14), transparent 25%),
-    radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.1), transparent 24%),
-    linear-gradient(180deg, #ffffff 0%, #f8fafc 48%, #eef6ff 100%);
-  color: #0f172a;
+    radial-gradient(circle at top left, rgba(56, 189, 248, 0.2), transparent 24%),
+    radial-gradient(circle at top right, rgba(251, 146, 60, 0.18), transparent 22%),
+    radial-gradient(circle at bottom left, rgba(236, 72, 153, 0.14), transparent 24%),
+    radial-gradient(circle at bottom right, rgba(168, 85, 247, 0.16), transparent 24%),
+    linear-gradient(135deg, #020617 0%, #0b1227 28%, #2a1d5d 54%, #8b2e11 78%, #020617 100%);
+  color: #ffffff;
 }
 
 a {

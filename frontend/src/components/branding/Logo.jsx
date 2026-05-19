@@ -1,4 +1,7 @@
-export default function Logo({ compact = false, className = '' }) {
+export default function Logo({ compact = false, className = '', tone = 'dark' }) {
+  const textToneClass = tone === 'light' ? 'text-white' : 'text-slate-900';
+  const subtitleToneClass = tone === 'light' ? 'text-white/70' : 'text-slate-500';
+
   return (
     <div className={`inline-flex items-center gap-3 ${className}`} aria-label="Syncly">
       <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
@@ -34,8 +37,8 @@ export default function Logo({ compact = false, className = '' }) {
 
       {!compact ? (
         <div className="leading-tight">
-          <p className="text-[0.82rem] font-semibold uppercase tracking-[0.34em] text-slate-900">Syncly</p>
-          <p className="text-xs text-slate-500">Professional. Verified. Connection.</p>
+          <p className={`text-[0.82rem] font-semibold uppercase tracking-[0.34em] ${textToneClass}`}>Syncly</p>
+          <p className={`text-xs ${subtitleToneClass}`}>Professional. Verified. Connection.</p>
         </div>
       ) : null}
     </div>
