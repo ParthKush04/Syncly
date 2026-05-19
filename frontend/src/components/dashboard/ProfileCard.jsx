@@ -7,7 +7,7 @@ export default function ProfileCard({ user, summary }) {
   const profileStrength = summary?.profileStrength ?? 0;
 
   return (
-    <section className="overflow-hidden rounded-[2.25rem] border border-slate-200 bg-white shadow-2xl shadow-slate-200/80">
+    <section className="overflow-hidden rounded-[2.25rem] border border-white/12 bg-white/8 shadow-2xl shadow-black/25 backdrop-blur-2xl">
       <div className="bg-[linear-gradient(135deg,rgba(8,15,35,0.96),rgba(14,165,233,0.18),rgba(255,255,255,0.02))] px-6 py-6 text-white sm:px-7">
         <div className="flex flex-col gap-5 md:flex-row md:items-center">
           <UserAvatar
@@ -53,9 +53,9 @@ export default function ProfileCard({ user, summary }) {
 
 function InfoRow({ label, value }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-slate-50/80 px-4 py-3 shadow-sm backdrop-blur">
-      <p className="text-xs uppercase tracking-[0.25em] text-slate-500">{label}</p>
-      <p className="mt-2 break-words text-sm font-medium text-slate-900">{value || '—'}</p>
+    <div className="rounded-2xl border border-white/12 bg-white/8 px-4 py-3 shadow-sm backdrop-blur-xl">
+      <p className="text-xs uppercase tracking-[0.25em] text-white/65">{label}</p>
+      <p className="mt-2 break-words text-sm font-medium text-white">{value || '—'}</p>
     </div>
   );
 }

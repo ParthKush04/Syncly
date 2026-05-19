@@ -8,21 +8,21 @@ export default function ConnectionStatusBadge() {
   const participants = useParticipants();
 
   return (
-    <div className="grid gap-3 rounded-3xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+    <div className="grid gap-3 rounded-3xl border border-white/12 bg-white/8 p-4 text-sm text-white/72 backdrop-blur-xl">
       <div className="flex items-center justify-between gap-4">
         <span>Connection</span>
-        <span className="font-semibold text-cyan-700">{callingState || 'idle'}</span>
+        <span className="font-semibold text-cyan-100">{callingState || 'idle'}</span>
       </div>
       <div className="flex items-center justify-between gap-4">
         <span>User</span>
-        <span className="font-semibold text-slate-900">{connectedUser?.name || 'Disconnected'}</span>
+        <span className="font-semibold text-white">{connectedUser?.name || 'Disconnected'}</span>
       </div>
       <div className="flex items-center justify-between gap-4">
         <span>Participants</span>
-        <span className="font-semibold text-slate-900">{participants.length}</span>
+        <span className="font-semibold text-white">{participants.length}</span>
       </div>
       {isAutoplayBlocked ? (
-        <div className="rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3 text-amber-800">
+        <div className="rounded-2xl border border-amber-300/20 bg-amber-400/10 px-4 py-3 text-amber-100">
           Audio playback is blocked by the browser until the next user interaction.
         </div>
       ) : null}

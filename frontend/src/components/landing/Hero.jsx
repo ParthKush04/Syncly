@@ -60,7 +60,7 @@ export default function Hero() {
 
           <div className="mt-10 grid gap-4 sm:grid-cols-3 animate-fade-up" style={{ animationDelay: '400ms' }}>
             {stats.map((stat) => (
-              <div key={stat.label} className="rounded-3xl border border-slate-200 bg-white/90 p-4 shadow-sm backdrop-blur transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/80">
+              <div key={stat.label} className="rounded-3xl border border-white/12 bg-white/8 p-4 shadow-sm backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20">
                 <p className="text-2xl font-semibold text-white">{stat.value}</p>
                 <p className="mt-2 text-sm leading-6 text-white/72">{stat.label}</p>
               </div>

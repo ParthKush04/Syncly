@@ -8,7 +8,7 @@ function ToggleButton({ active, label, onClick }) {
       onClick={onClick}
       className={`rounded-2xl border px-4 py-3 text-sm font-semibold transition ${
         active
-          ? 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+          ? 'border-white/12 bg-white/10 text-white hover:bg-white/15'
           : 'border-cyan-200 bg-cyan-500 text-white hover:bg-cyan-400'
       }`}
     >
@@ -57,7 +57,7 @@ export default function CallControlsPanel({ onSkip, onLeaveToDashboard, onLeave,
   }, [call, onLeave]);
 
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div className="flex flex-wrap items-center gap-3 rounded-3xl border border-white/12 bg-white/8 p-4 shadow-sm backdrop-blur-xl">
       <ToggleButton active={!isMicrophoneMuted} label={isMicrophoneMuted ? 'Unmute' : 'Mute'} onClick={() => microphone.toggle()} />
       <ToggleButton active={!isCameraMuted} label={isCameraMuted ? 'Camera off' : 'Camera on'} onClick={() => camera.toggle()} />
       <button

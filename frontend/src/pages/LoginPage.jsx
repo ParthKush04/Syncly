@@ -12,17 +12,17 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen px-4 py-10 text-slate-900 sm:px-6 lg:px-10">
+    <main className="min-h-screen px-4 py-10 text-white sm:px-6 lg:px-10">
       <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-7xl items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
         <aside className="order-2 lg:order-1">
           <div className="max-w-xl">
-            <span className="inline-flex rounded-full border border-cyan-200 bg-cyan-50 px-4 py-2 text-sm font-medium text-cyan-700">
+            <span className="inline-flex rounded-full border border-white/12 bg-white/8 px-4 py-2 text-sm font-medium text-white">
               Professional access
             </span>
-            <h2 className="mt-6 text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
+            <h2 className="mt-6 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
               Sign in to discover verified professionals.
             </h2>
-            <p className="mt-5 text-lg leading-8 text-slate-600">
+            <p className="mt-5 text-lg leading-8 text-white/75">
               Join high-signal networking rooms, match on shared interests and goals, and start one-on-one calls with
               people who actually matter to your growth.
             </p>
@@ -41,9 +41,9 @@ export default function LoginPage() {
             title="Welcome back"
             subtitle="Use a social account to continue quickly and securely. Your professional profile stays at the center of the experience."
             footer={
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-white/70">
                 No account yet?{' '}
-                <a href="/signup" className="font-medium text-cyan-700 transition hover:text-cyan-600">
+                <a href="/signup" className="font-medium text-cyan-200 transition hover:text-white">
                   Create one
                 </a>
               </p>
@@ -66,7 +66,7 @@ export default function LoginPage() {
               onClick={() => handleOAuth('linkedin')}
             />
 
-            <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm leading-6 text-slate-600">
+            <div className="mt-3 rounded-2xl border border-white/12 bg-white/8 px-4 py-4 text-sm leading-6 text-white/75">
               By signing in, you agree to a professional networking environment built around trust, relevance, and real
               conversations.
             </div>
@@ -79,9 +79,9 @@ export default function LoginPage() {
 
 function FeatureStat({ value, label }) {
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm backdrop-blur">
-      <p className="text-2xl font-semibold text-slate-900">{value}</p>
-      <p className="mt-2 text-sm leading-6 text-slate-500">{label}</p>
+    <div className="rounded-3xl border border-white/12 bg-white/8 p-4 shadow-sm backdrop-blur-xl">
+      <p className="text-2xl font-semibold text-white">{value}</p>
+      <p className="mt-2 text-sm leading-6 text-white/70">{label}</p>
     </div>
   );
 }

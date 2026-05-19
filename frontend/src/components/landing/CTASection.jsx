@@ -35,7 +35,7 @@ export default function CTASection() {
             />
             <button
               type="submit"
-              className="min-h-14 rounded-full bg-white px-6 font-semibold text-slate-950 transition duration-300 hover:-translate-y-0.5 hover:bg-slate-100 hover:shadow-xl hover:shadow-black/20"
+              className="min-h-14 rounded-full border border-white/15 bg-white/10 px-6 font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-white/15 hover:shadow-xl hover:shadow-black/20"
             >
               Request access
             </button>

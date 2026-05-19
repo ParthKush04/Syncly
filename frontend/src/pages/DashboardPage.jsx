@@ -74,18 +74,18 @@ export default function DashboardPage() {
   };
 
   return (
-    <main className="min-h-screen px-4 py-6 text-slate-900 sm:px-6 lg:px-10 lg:py-8">
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-[linear-gradient(180deg,rgba(248,250,252,0.98),rgba(241,245,249,0.94)),radial-gradient(circle_at_top_left,rgba(56,189,248,0.14),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.12),transparent_24%)]" />
+    <main className="min-h-screen px-4 py-6 text-white sm:px-6 lg:px-10 lg:py-8">
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.18),transparent_24%),radial-gradient(circle_at_top_right,rgba(249,115,22,0.14),transparent_22%),radial-gradient(circle_at_bottom_left,rgba(236,72,153,0.12),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.14),transparent_24%),linear-gradient(135deg,#020617_0%,#0b1227_28%,#2a1d5d_54%,#8b2e11_78%,#020617_100%)]" />
       <div className="mx-auto grid max-w-7xl gap-6">
         <DashboardNavbar user={user || {}} onSignOut={handleSignOut} />
-        <section className="overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white shadow-2xl shadow-slate-200/70">
+        <section className="overflow-hidden rounded-[2.5rem] border border-white/12 bg-white/8 shadow-2xl shadow-black/25 backdrop-blur-2xl">
           <div className="grid gap-6 bg-[linear-gradient(135deg,rgba(8,15,35,0.98),rgba(15,23,42,0.92)_55%,rgba(14,165,233,0.75))] px-6 py-8 text-white sm:px-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:px-10">
             <div>
               <p className="text-xs uppercase tracking-[0.45em] text-cyan-100/85">Dashboard</p>
               <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
                 {loading ? 'Loading your dashboard...' : `Welcome back, ${user?.fullName || 'user'}`}
               </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-white/72 sm:text-base">
                 A simple overview of your profile strength, reputation, and matching activity.
               </p>
             </div>
@@ -113,9 +113,9 @@ export default function DashboardPage() {
 
 function StatPill({ label, value, dark = false }) {
   return (
-    <div className={`rounded-2xl border px-4 py-3 text-left shadow-sm ${dark ? 'border-white/10 bg-white/10 backdrop-blur-md' : 'border-slate-200 bg-slate-50'}`}>
-      <p className={`text-xs uppercase tracking-[0.25em] ${dark ? 'text-cyan-100/80' : 'text-slate-500'}`}>{label}</p>
-      <p className={`mt-2 text-lg font-semibold ${dark ? 'text-white' : 'text-slate-900'}`}>{value}</p>
+    <div className={`rounded-2xl border px-4 py-3 text-left shadow-sm ${dark ? 'border-white/10 bg-white/10 backdrop-blur-md' : 'border-white/10 bg-white/8'}`}>
+      <p className={`text-xs uppercase tracking-[0.25em] ${dark ? 'text-cyan-100/80' : 'text-white/65'}`}>{label}</p>
+      <p className={`mt-2 text-lg font-semibold text-white`}>{value}</p>
     </div>
   );
 }

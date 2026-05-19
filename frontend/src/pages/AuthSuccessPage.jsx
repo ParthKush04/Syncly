@@ -75,14 +75,14 @@ export default function AuthSuccessPage() {
   }, [navigate]);
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-4 text-slate-900">
-      <div className="max-w-md rounded-[2rem] border border-slate-200 bg-white p-8 text-center shadow-2xl shadow-slate-200/80">
+    <main className="flex min-h-screen items-center justify-center px-4 text-white">
+      <div className="max-w-md rounded-[2rem] border border-white/12 bg-white/8 p-8 text-center shadow-2xl shadow-black/25 backdrop-blur-2xl">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-500 text-white shadow-lg shadow-cyan-200/70">
           <span className="text-xl font-semibold">S</span>
         </div>
-        <h1 className="mt-6 text-2xl font-semibold text-slate-900">Signing you in</h1>
-        <p className="mt-3 text-sm leading-7 text-slate-600">{status || error}</p>
-        {error ? <p className="mt-4 rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p> : null}
+        <h1 className="mt-6 text-2xl font-semibold text-white">Signing you in</h1>
+        <p className="mt-3 text-sm leading-7 text-white/75">{status || error}</p>
+        {error ? <p className="mt-4 rounded-2xl border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">{error}</p> : null}
       </div>
     </main>
   );

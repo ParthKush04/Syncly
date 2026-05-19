@@ -40,66 +40,66 @@ export default function VideoLobby() {
   };
 
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl shadow-slate-200/80 backdrop-blur-xl">
+    <section className="rounded-3xl border border-white/12 bg-white/8 p-6 shadow-2xl shadow-black/25 backdrop-blur-2xl">
       <div className="mb-6">
-        <p className="text-sm uppercase tracking-[0.35em] text-cyan-700">Stream Video SDK</p>
-        <h2 className="mt-2 text-2xl font-semibold text-slate-900">One-on-one call lobby</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-600">
+        <p className="text-sm uppercase tracking-[0.35em] text-cyan-100">Stream Video SDK</p>
+        <h2 className="mt-2 text-2xl font-semibold text-white">One-on-one call lobby</h2>
+        <p className="mt-2 text-sm leading-6 text-white/70">
           Connect a user, fetch a short-lived token from your backend, then join a one-on-one audio or video call.
         </p>
       </div>
 
       <form className="grid gap-4" onSubmit={handleStartAndJoin}>
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="grid gap-2 text-sm text-slate-600">
+          <label className="grid gap-2 text-sm text-white/70">
             User ID
             <input
               value={form.userId}
               onChange={updateField('userId')}
-              className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-cyan-400"
+              className="rounded-2xl border border-white/12 bg-white/8 px-4 py-3 text-white outline-none transition focus:border-cyan-400"
               placeholder="user-123"
             />
           </label>
-          <label className="grid gap-2 text-sm text-slate-600">
+          <label className="grid gap-2 text-sm text-white/70">
             Display name
             <input
               value={form.name}
               onChange={updateField('name')}
-              className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-cyan-400"
+              className="rounded-2xl border border-white/12 bg-white/8 px-4 py-3 text-white outline-none transition focus:border-cyan-400"
               placeholder="Amina Patel"
             />
           </label>
         </div>
 
-        <label className="grid gap-2 text-sm text-slate-600">
+        <label className="grid gap-2 text-sm text-white/70">
           Profile image URL
           <input
             value={form.image}
             onChange={updateField('image')}
-            className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-cyan-400"
+            className="rounded-2xl border border-white/12 bg-white/8 px-4 py-3 text-white outline-none transition focus:border-cyan-400"
             placeholder="https://..."
           />
         </label>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="grid gap-2 text-sm text-slate-600">
+          <label className="grid gap-2 text-sm text-white/70">
             Call type
             <select
               value={form.callType}
               onChange={updateField('callType')}
-              className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-cyan-400"
+              className="rounded-2xl border border-white/12 bg-white/8 px-4 py-3 text-white outline-none transition focus:border-cyan-400"
             >
               <option value="default">Default</option>
               <option value="audio_room">Audio room</option>
             </select>
           </label>
 
-          <label className="grid gap-2 text-sm text-slate-600">
+          <label className="grid gap-2 text-sm text-white/70">
             Call ID
             <input
               value={form.callId}
               onChange={updateField('callId')}
-              className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-cyan-400"
+              className="rounded-2xl border border-white/12 bg-white/8 px-4 py-3 text-white outline-none transition focus:border-cyan-400"
               placeholder="one-on-one-room"
             />
           </label>
@@ -108,26 +108,26 @@ export default function VideoLobby() {
         <button
           type="submit"
           disabled={isBusy}
-          className="rounded-2xl bg-slate-900 px-5 py-3 font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-2xl border border-white/12 bg-white/10 px-5 py-3 font-semibold text-white transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isBusy ? 'Connecting...' : 'Connect and join call'}
         </button>
       </form>
 
-      <div className="mt-6 grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+      <div className="mt-6 grid gap-3 rounded-2xl border border-white/12 bg-white/8 p-4 text-sm text-white/72">
         <div className="flex items-center justify-between gap-4">
           <span>Status</span>
-          <span className="font-medium text-slate-900">{status}</span>
+          <span className="font-medium text-white">{status}</span>
         </div>
         <div className="flex items-center justify-between gap-4">
           <span>Connected user</span>
-          <span className="font-medium text-slate-900">{identity.name || 'None'}</span>
+          <span className="font-medium text-white">{identity.name || 'None'}</span>
         </div>
         <div className="flex items-center justify-between gap-4">
           <span>Active call</span>
-          <span className="font-medium text-slate-900">{callType ? `${callType} / ${callId}` : 'None'}</span>
+          <span className="font-medium text-white">{callType ? `${callType} / ${callId}` : 'None'}</span>
         </div>
-        {error ? <p className="rounded-xl bg-rose-50 px-4 py-3 text-rose-700">{error}</p> : null}
+        {error ? <p className="rounded-xl border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-rose-100">{error}</p> : null}
       </div>
     </section>
   );

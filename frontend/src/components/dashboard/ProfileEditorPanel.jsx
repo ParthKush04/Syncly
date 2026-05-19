@@ -5,7 +5,7 @@ function Chip({ label, onRemove }) {
     <button
       type="button"
       onClick={onRemove}
-      className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700"
+      className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/8 px-3 py-2 text-sm font-medium text-white shadow-sm transition hover:border-rose-200/30 hover:bg-white/12 hover:text-rose-100"
     >
       <span>{label}</span>
       <span aria-hidden="true">×</span>
@@ -20,13 +20,13 @@ function InterestEditor({ title, placeholder, items, inputValue, setInputValue, 
       : 'border-cyan-100 bg-cyan-50 text-cyan-700 focus:border-cyan-300';
 
   return (
-    <section className="rounded-[2rem] border border-slate-200 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,250,252,0.98))] p-5 shadow-lg shadow-slate-200/80">
+    <section className="rounded-[2rem] border border-white/12 bg-white/8 p-5 shadow-lg shadow-black/25 backdrop-blur-2xl">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-sm uppercase tracking-[0.35em] text-cyan-700">Profile editor</p>
-          <h3 className="mt-2 text-xl font-semibold text-slate-900">{title}</h3>
+          <p className="text-sm uppercase tracking-[0.35em] text-cyan-100">Profile editor</p>
+          <h3 className="mt-2 text-xl font-semibold text-white">{title}</h3>
         </div>
-        <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-500">
+        <span className="rounded-full border border-white/12 bg-white/8 px-3 py-1 text-xs text-white/65">
           {items.length} items
         </span>
       </div>
@@ -42,12 +42,12 @@ function InterestEditor({ title, placeholder, items, inputValue, setInputValue, 
             }
           }}
           placeholder={placeholder}
-          className={`min-h-12 flex-1 rounded-full border px-4 text-sm outline-none transition placeholder:text-slate-400 ${accentClasses}`}
+          className={`min-h-12 flex-1 rounded-full border px-4 text-sm outline-none transition placeholder:text-white/35 bg-white/8 text-white ${accentClasses}`}
         />
         <button
           type="button"
           onClick={onAdd}
-          className="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-5 text-sm font-semibold text-white transition hover:bg-slate-700"
+          className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/12 bg-white/10 px-5 text-sm font-semibold text-white transition hover:bg-white/15"
         >
           Add
         </button>
@@ -55,7 +55,7 @@ function InterestEditor({ title, placeholder, items, inputValue, setInputValue, 
 
       <div className="mt-4 flex flex-wrap gap-3">
         {items.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-500">
+          <div className="rounded-2xl border border-dashed border-white/12 bg-white/8 px-4 py-3 text-sm text-white/65">
             Add a few items to make your profile stronger.
           </div>
         ) : (
@@ -96,23 +96,23 @@ export default function ProfileEditorPanel({ user, onSave, saving = false }) {
   };
 
   return (
-    <section className="rounded-[2.25rem] border border-slate-200 bg-white p-6 shadow-2xl shadow-slate-200/80">
+    <section className="rounded-[2.25rem] border border-white/12 bg-white/8 p-6 shadow-2xl shadow-black/25 backdrop-blur-2xl">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="max-w-2xl">
-          <p className="text-sm uppercase tracking-[0.35em] text-cyan-700">Profile setup</p>
-          <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
+          <p className="text-sm uppercase tracking-[0.35em] text-cyan-100">Profile setup</p>
+          <h2 className="mt-3 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
             Keep one clean interests list and update it whenever your focus changes.
           </h2>
-          <p className="mt-3 text-sm leading-7 text-slate-600">
+          <p className="mt-3 text-sm leading-7 text-white/72">
             Add interests here so your profile stays tidy, relevant, and easy for matching to interpret.
           </p>
         </div>
 
         <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap">
           {summary.map((item) => (
-            <div key={item.label} className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 shadow-sm">
-              <p className="text-xs uppercase tracking-[0.25em] text-slate-500">{item.label}</p>
-              <p className="mt-2 text-lg font-semibold text-slate-900">{item.value}</p>
+            <div key={item.label} className="rounded-2xl border border-white/12 bg-white/8 px-4 py-3 shadow-sm backdrop-blur-xl">
+              <p className="text-xs uppercase tracking-[0.25em] text-white/65">{item.label}</p>
+              <p className="mt-2 text-lg font-semibold text-white">{item.value}</p>
             </div>
           ))}
         </div>
@@ -131,15 +131,15 @@ export default function ProfileEditorPanel({ user, onSave, saving = false }) {
         />
       </div>
 
-      <div className="mt-6 flex flex-col gap-3 rounded-[1.5rem] border border-cyan-100 bg-cyan-50 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm leading-6 text-slate-600">
+      <div className="mt-6 flex flex-col gap-3 rounded-[1.5rem] border border-white/12 bg-white/8 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm leading-6 text-white/72">
           Your edits are saved to your profile so matchmaking and your dashboard stay in sync.
         </p>
         <button
           type="button"
           onClick={handleSubmit}
           disabled={saving}
-          className="inline-flex min-h-12 items-center justify-center rounded-full bg-slate-900 px-5 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-70"
+          className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/12 bg-white/10 px-5 text-sm font-semibold text-white transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-70"
         >
           {saving ? 'Saving...' : 'Save profile'}
         </button>
