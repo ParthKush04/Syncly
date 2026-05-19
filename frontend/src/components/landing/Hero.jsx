@@ -28,8 +28,6 @@ export default function Hero() {
       <div className="absolute inset-x-0 top-0 -z-10 h-[42rem] bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.18),transparent_30%),radial-gradient(circle_at_top_right,rgba(251,146,60,0.15),transparent_28%),radial-gradient(circle_at_50%_78%,rgba(236,72,153,0.12),transparent_28%)]" />
       <div className="absolute left-[-6rem] top-20 -z-10 h-80 w-80 rounded-full bg-sky-400/20 blur-3xl animate-drift-slow" />
       <div className="absolute right-[-4rem] top-56 -z-10 h-72 w-72 rounded-full bg-fuchsia-400/20 blur-3xl animate-drift-slow" />
-        <div className="absolute right-[-4rem] top-56 -z-10 h-72 w-72 rounded-full bg-fuchsia-400/20 blur-3xl animate-drift-slow" />
-                        <div className="bg-gradient-to-br from-sky-400 via-fuchsia-400 to-violet-500 text-sm font-bold text-white shadow-sm">
       <div className="mx-auto grid max-w-7xl gap-14 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
         <div className="relative z-10 animate-fade-up" style={{ animationDelay: '80ms' }}>
           <span className="inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-white shadow-sm backdrop-blur-md">
