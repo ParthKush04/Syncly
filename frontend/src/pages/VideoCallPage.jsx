@@ -117,26 +117,26 @@ export default function VideoCallPage() {
   }, [isExitingCall, isInCall, status]);
 
   return (
-    <main className="relative min-h-[100dvh] overflow-hidden bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_24%),radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.16),transparent_24%),linear-gradient(180deg,#020617_0%,#0f172a_100%)] text-white">
+    <main className="relative h-screen w-screen overflow-hidden bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_24%),radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.16),transparent_24%),linear-gradient(180deg,#020617_0%,#0f172a_100%)] text-white">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.04)_0%,transparent_35%,rgba(255,255,255,0.03)_100%)]" />
-      <div className="relative flex min-h-[100dvh] flex-col px-3 py-3 sm:px-4 sm:py-4 lg:px-5 lg:py-5">
-        <header className="mb-3 flex items-center justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-xl sm:mb-4">
-          <Logo compact className="scale-90 origin-left text-white [&_p]:text-white [&_p:last-child]:text-slate-300" />
+      <div className="relative grid h-full min-h-0 grid-rows-[auto,minmax(0,1fr),auto] gap-3 px-3 py-3 sm:px-4 sm:py-4 lg:px-5 lg:py-5">
+        <header className="flex items-center justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-xl">
+          <Logo compact className="scale-90 origin-left text-white [&_p]:text-white [&_p:last-child]:text-slate-300" tone="light" />
           <div className="flex items-center gap-3 text-xs uppercase tracking-[0.35em] text-slate-300">
             <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-emerald-200">{callStatusLabel}</span>
             <span className="hidden sm:inline">Video room</span>
           </div>
         </header>
 
-        <div className="relative flex min-h-0 flex-1 flex-col">
+        <div className="relative min-h-0">
           <VideoRoom joining={status === 'joining'} status={callStatusLabel} />
         </div>
 
-        <div className="fixed inset-x-0 bottom-4 z-30 flex justify-center px-3 sm:bottom-5 sm:px-4">
-          <div className="w-full max-w-md rounded-full border border-white/10 bg-slate-950/80 p-3 shadow-2xl shadow-black/35 backdrop-blur-2xl">
+        <footer className="flex justify-center pb-[calc(env(safe-area-inset-bottom)+0.25rem)]">
+          <div className="w-full max-w-6xl rounded-[1.75rem] border border-white/10 bg-slate-950/80 p-3 shadow-2xl shadow-black/35 backdrop-blur-2xl">
             <CallControls onSkip={handleSkip} onLeave={handleLeave} isBusy={isExitingCall} />
           </div>
-        </div>
+        </footer>
 
         {error ? (
           <div className="pointer-events-none fixed left-1/2 top-20 z-30 w-[min(92vw,32rem)] -translate-x-1/2 rounded-2xl border border-rose-400/25 bg-rose-500/15 px-4 py-3 text-sm text-rose-100 shadow-2xl shadow-black/30 backdrop-blur-xl">
