@@ -2,10 +2,14 @@ import { useCallStateHooks, useConnectedUser } from '@stream-io/video-react-sdk'
 
 export default function ConnectionStatusBadge() {
   const connectedUser = useConnectedUser();
-  const { useCallCallingState, useIsAutoplayBlocked, useParticipants } = useCallStateHooks();
-  const callingState = useCallCallingState();
-  const isAutoplayBlocked = useIsAutoplayBlocked();
-  const participants = useParticipants();
+  const callStateHooks = useCallStateHooks();
+  const useCallCallingState = callStateHooks?.useCallCallingState;
+  const useIsAutoplayBlocked = callStateHooks?.useIsAutoplayBlocked;
+  const useParticipants = callStateHooks?.useParticipants;
+
+  const callingState = useCallCallingState ? useCallCallingState() : null;
+  const isAutoplayBlocked = useIsAutoplayBlocked ? useIsAutoplayBlocked() : false;
+  const participants = useParticipants ? useParticipants() : [];
 
   return (
     <div className="grid gap-3 rounded-3xl border border-white/12 bg-white/8 p-4 text-sm text-white/72 backdrop-blur-xl">

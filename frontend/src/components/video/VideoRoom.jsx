@@ -245,15 +245,14 @@ function VideoStage({
   onJoin,
   joining
 }) {
-  const {
-    useParticipants,
-    useCallCallingState
-  } = useCallStateHooks();
+  const callStateHooks = useCallStateHooks();
+  const useParticipants = callStateHooks?.useParticipants;
+  const useCallCallingState = callStateHooks?.useCallCallingState;
 
   /* SAFE PARTICIPANTS */
-  const participants = useParticipants() || [];
+  const participants = useParticipants ? useParticipants() : [];
 
-  const callingState = useCallCallingState();
+  const callingState = useCallCallingState ? useCallCallingState() : null;
 
   const dominantSpeaker =
     participants.find((p) => p.isDominantSpeaker) || null;
