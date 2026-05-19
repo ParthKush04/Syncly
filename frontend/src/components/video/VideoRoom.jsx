@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ParticipantView, StreamCall, StreamTheme, StreamVideo, useCallStateHooks } from '@stream-io/video-react-sdk';
+import ErrorBoundary from '../common/ErrorBoundary.jsx';
 import { useStreamVideoSession } from '../../context/StreamVideoSessionContext.jsx';
 
 function useViewportWidth() {
@@ -258,15 +259,17 @@ export default function VideoRoom({ onJoin = null, joining = false, status = 're
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.16),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.18),transparent_34%),linear-gradient(180deg,rgba(2,6,23,0.96)_0%,rgba(15,23,42,0.96)_100%)]" />
 
       <StreamVideo client={client}>
-        {call ? (
-          <StreamCall call={call}>
-            <StreamTheme>
-              <VideoStage onJoin={onJoin} joining={joining} status={status} />
-            </StreamTheme>
-          </StreamCall>
-        ) : (
-          <WaitingPanel onJoin={onJoin} joining={joining} status={status} />
-        )}
+        <ErrorBoundary>
+          {call ? (
+            <StreamCall call={call}>
+              <StreamTheme>
+                <VideoStage onJoin={onJoin} joining={joining} status={status} />
+              </StreamTheme>
+            </StreamCall>
+          ) : (
+            <WaitingPanel onJoin={onJoin} joining={joining} status={status} />
+          )}
+        </ErrorBoundary>
       </StreamVideo>
     </section>
   );
