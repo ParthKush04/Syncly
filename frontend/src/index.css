@@ -75,6 +75,31 @@ a {
   }
 }
 
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.94) translateY(12px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    opacity: 0.65;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+}
+
 @keyframes sheen {
   0% {
     background-position: 0% 50%;
@@ -101,6 +126,14 @@ a {
   animation: fade-up 0.8s ease both;
 }
 
+.animate-pop-in {
+  animation: pop-in 0.9s ease both;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 3.5s ease-in-out infinite;
+}
+
 .animate-sheen {
   background-size: 200% 200%;
   animation: sheen 9s linear infinite;
@@ -111,6 +144,8 @@ a {
   .animate-float-soft,
   .animate-drift-slow,
   .animate-fade-up,
+  .animate-pop-in,
+  .animate-glow-pulse,
   .animate-sheen {
     animation: none;
   }

@@ -1,24 +1,16 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import CallHeader from '../components/videoCall/CallHeader.jsx';
-import VideoPane from '../components/videoCall/VideoPane.jsx';
+import Logo from '../components/branding/Logo.jsx';
 import CallControls from '../components/videoCall/CallControls.jsx';
 import VideoRoom from '../components/video/VideoRoom.jsx';
 import { useStreamVideoSession } from '../context/StreamVideoSessionContext.jsx';
-
-function formatTime(seconds) {
-  const minutes = String(Math.floor(seconds / 60)).padStart(2, '0');
-  const remainingSeconds = String(seconds % 60).padStart(2, '0');
-  return `${minutes}:${remainingSeconds}`;
-}
 
 export default function VideoCallPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { ensureSessionAndJoin, status, error, setError, isInCall, setCallId, setCallType, leaveCall, disconnect } = useStreamVideoSession();
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isExitingCall, setIsExitingCall] = useState(false);
-  const lastJoinKeyRef = useRef('');
+  const joinKeyRef = useRef('');
   const exitInProgressRef = useRef(false);
 
   useEffect(() => {
@@ -50,11 +42,11 @@ export default function VideoCallPage() {
       };
 
       const joinKey = `${identity.userId}:${callType}:${callId}`;
-      if (lastJoinKeyRef.current === joinKey) {
+      if (joinKeyRef.current === joinKey) {
         return undefined;
       }
 
-      lastJoinKeyRef.current = joinKey;
+      joinKeyRef.current = joinKey;
 
       console.log('[video-call] auth/token readiness', {
         hasToken: Boolean(token),
@@ -72,7 +64,7 @@ export default function VideoCallPage() {
         callType
       }).then((joined) => {
         if (!joined && !cancelled) {
-          lastJoinKeyRef.current = '';
+          joinKeyRef.current = '';
         }
       });
     } catch {
@@ -84,120 +76,74 @@ export default function VideoCallPage() {
     };
   }, [ensureSessionAndJoin, searchParams, setCallId, setCallType, setError]);
 
-  useEffect(() => {
-    const intervalId = window.setInterval(() => {
-      setElapsedSeconds((current) => current + 1);
-    }, 1000);
+  const exitAndNavigate = useCallback(
+    async (destination, reason) => {
+      if (exitInProgressRef.current) {
+        return;
+      }
 
-    return () => window.clearInterval(intervalId);
-  }, []);
+      exitInProgressRef.current = true;
+      setIsExitingCall(true);
 
-  const sessionTime = useMemo(() => formatTime(elapsedSeconds), [elapsedSeconds]);
+      try {
+        console.log('[video-call] exit flow start', { destination, reason });
+        await leaveCall();
+        await disconnect();
+        console.log('[video-call] exit flow success', { destination, reason });
+      } catch (exitError) {
+        console.error('[video-call] exit flow failed', {
+          destination,
+          reason,
+          message: exitError instanceof Error ? exitError.message : exitError
+        });
+      } finally {
+        setIsExitingCall(false);
+        exitInProgressRef.current = false;
+        navigate(destination, { replace: true });
+      }
+    },
+    [disconnect, leaveCall, navigate]
+  );
 
-  const exitCallAndNavigate = async (destination, reason) => {
-    if (exitInProgressRef.current) {
-      return;
+  const handleSkip = useCallback(() => exitAndNavigate('/matchmaking', 'skip'), [exitAndNavigate]);
+  const handleLeave = useCallback(() => exitAndNavigate('/dashboard', 'leave-dashboard'), [exitAndNavigate]);
+
+  const callStatusLabel = useMemo(() => {
+    if (isExitingCall) {
+      return 'Leaving...';
     }
 
-    exitInProgressRef.current = true;
-    setIsExitingCall(true);
-
-    try {
-      console.log('[video-call] exit flow start', { destination, reason });
-      await leaveCall();
-      await disconnect();
-      console.log('[video-call] exit flow success', { destination, reason });
-    } catch (exitError) {
-      console.error('[video-call] exit flow failed', {
-        destination,
-        reason,
-        message: exitError instanceof Error ? exitError.message : exitError
-      });
-    } finally {
-      setElapsedSeconds(0);
-      setIsExitingCall(false);
-      exitInProgressRef.current = false;
-      navigate(destination, { replace: true });
-    }
-  };
-
-  const handleSkip = async () => {
-    await exitCallAndNavigate('/matchmaking', 'skip');
-  };
-
-  const handleLeaveToDashboard = async () => {
-    await exitCallAndNavigate('/dashboard', 'leave-dashboard');
-  };
+    return isInCall ? 'Connected' : status;
+  }, [isExitingCall, isInCall, status]);
 
   return (
-    <main className="min-h-screen px-4 py-6 text-slate-900 sm:px-6 lg:px-10 lg:py-8">
-      <div className="mx-auto grid max-w-7xl gap-6">
-        <CallHeader sessionTime={sessionTime} connectionStatus={isInCall ? 'Connected' : status} roomName="Professional video call" />
-
-        <section className="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(320px,0.8fr)]">
-          <div className="grid gap-6">
-            <VideoRoom onSkip={handleSkip} onLeaveToDashboard={handleLeaveToDashboard} isExitingCall={isExitingCall} />
-
-            <div className="grid gap-6 sm:grid-cols-2">
-              <VideoPane title="Your camera" subtitle="Previewing local audio and video" accent="emerald" isLocal={true} />
-
-              <aside className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-lg shadow-slate-200/80 backdrop-blur-xl">
-                <p className="text-sm uppercase tracking-[0.35em] text-cyan-700">Session details</p>
-                <div className="mt-4 space-y-3 text-sm text-slate-600">
-                  <InfoRow label="Session timer" value={sessionTime} />
-                  <InfoRow label="Status" value={isInCall ? 'In call' : status} />
-                  <InfoRow label="Camera" value={isInCall ? 'Live' : 'Waiting'} />
-                  <InfoRow label="Connection" value="Stable" />
-                </div>
-              </aside>
-            </div>
+    <main className="relative min-h-[100dvh] overflow-hidden bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_24%),radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.16),transparent_24%),linear-gradient(180deg,#020617_0%,#0f172a_100%)] text-white">
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.04)_0%,transparent_35%,rgba(255,255,255,0.03)_100%)]" />
+      <div className="relative flex min-h-[100dvh] flex-col px-3 py-3 sm:px-4 sm:py-4 lg:px-5 lg:py-5">
+        <header className="mb-3 flex items-center justify-between gap-4 rounded-[1.5rem] border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-xl sm:mb-4">
+          <Logo compact className="scale-90 origin-left text-white [&_p]:text-white [&_p:last-child]:text-slate-300" />
+          <div className="flex items-center gap-3 text-xs uppercase tracking-[0.35em] text-slate-300">
+            <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-emerald-200">{callStatusLabel}</span>
+            <span className="hidden sm:inline">Video room</span>
           </div>
+        </header>
 
-          <div className="grid gap-6 self-start">
-            <section className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-2xl shadow-slate-200/80 backdrop-blur-xl">
-              <p className="text-sm uppercase tracking-[0.35em] text-cyan-700">Call summary</p>
-              <h2 className="mt-3 text-2xl font-semibold text-slate-900">Focused, premium communication</h2>
-              <p className="mt-3 text-sm leading-7 text-slate-600">
-                Keep the conversation centered with a clear visual hierarchy, strong contrast, and controls that feel natural on every screen size.
-              </p>
+        <div className="relative flex min-h-0 flex-1 flex-col">
+          <VideoRoom joining={status === 'joining'} status={callStatusLabel} />
+        </div>
 
-              <div className="mt-5 grid gap-3">
-                <MiniStat label="Local stream" value={isInCall ? 'Ready' : 'Connecting'} />
-                <MiniStat label="Remote stream" value={isInCall ? 'Live' : 'Waiting'} />
-                <MiniStat label="Call duration" value={sessionTime} />
-              </div>
-            </section>
-
-            <CallControls
-              onSkip={handleSkip}
-              onLeave={handleLeaveToDashboard}
-              isBusy={isExitingCall}
-            />
-
-            <div className="rounded-[2rem] border border-cyan-100 bg-cyan-50 p-5 text-sm leading-7 text-cyan-900">
-              {error || 'Tip: matchmaking now routes into the real Stream video flow, so a match can open an actual call session.'}
-            </div>
+        <div className="fixed inset-x-0 bottom-4 z-30 flex justify-center px-3 sm:bottom-5 sm:px-4">
+          <div className="w-full max-w-md rounded-full border border-white/10 bg-slate-950/80 p-3 shadow-2xl shadow-black/35 backdrop-blur-2xl">
+            <CallControls onSkip={handleSkip} onLeave={handleLeave} isBusy={isExitingCall} />
           </div>
-        </section>
+        </div>
+
+        {error ? (
+          <div className="pointer-events-none fixed left-1/2 top-20 z-30 w-[min(92vw,32rem)] -translate-x-1/2 rounded-2xl border border-rose-400/25 bg-rose-500/15 px-4 py-3 text-sm text-rose-100 shadow-2xl shadow-black/30 backdrop-blur-xl">
+            {error}
+          </div>
+        ) : null}
       </div>
     </main>
-  );
-}
-
-function InfoRow({ label, value }) {
-  return (
-    <div className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-      <span className="text-slate-500">{label}</span>
-      <span className="font-semibold text-slate-900">{value}</span>
-    </div>
-  );
-}
-
-function MiniStat({ label, value }) {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-      <p className="text-xs uppercase tracking-[0.25em] text-slate-500">{label}</p>
-      <p className="mt-2 text-base font-semibold text-slate-900">{value}</p>
-    </div>
   );
 }
