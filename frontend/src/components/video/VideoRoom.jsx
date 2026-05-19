@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ParticipantView,
   StreamCall,
   StreamTheme,
   StreamVideo,
+  useCall,
   useCallStateHooks
 } from '@stream-io/video-react-sdk';
 
@@ -104,8 +105,8 @@ function VideoFrame({
         overlay ? 'ring-1 ring-white/10' : ''
       }`}
     >
-      {/* SAFE VIDEO RENDER */}
-      {participant?.videoStream || participant?.videoTrack ? (
+      {/* Always mount ParticipantView so Stream can attach video/audio tracks. */}
+      {participant ? (
         <ParticipantView
           participant={participant}
           trackType="videoTrack"
@@ -254,6 +255,8 @@ function VideoStage({
   const useLocalParticipant = callStateHooks?.useLocalParticipant;
   const useRemoteParticipants = callStateHooks?.useRemoteParticipants;
   const useCallCallingState = callStateHooks?.useCallCallingState;
+  const useIsAutoplayBlocked = callStateHooks?.useIsAutoplayBlocked;
+  const call = useCall();
 
   /* SAFE PARTICIPANTS */
   const localParticipant = useLocalParticipant ? useLocalParticipant() : null;
@@ -264,6 +267,11 @@ function VideoStage({
   ];
 
   const callingState = useCallCallingState ? useCallCallingState() : null;
+  const isAutoplayBlocked = useIsAutoplayBlocked ? useIsAutoplayBlocked() : false;
+
+  const handleResumeAudio = useCallback(() => {
+    void call?.resumeAudio?.();
+  }, [call]);
 
   useViewportWidth();
 
@@ -286,6 +294,19 @@ function VideoStage({
         status={callingState || status}
         participantCount={participants.length}
       />
+
+      {isAutoplayBlocked ? (
+        <div className="flex items-center justify-between gap-3 rounded-[1.25rem] border border-cyan-300/20 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-50">
+          <p>Audio is blocked by the browser until you allow playback.</p>
+          <button
+            type="button"
+            onClick={handleResumeAudio}
+            className="rounded-full bg-cyan-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-400"
+          >
+            Enable audio
+          </button>
+        </div>
+      ) : null}
 
       <div className="relative min-h-0 flex-1">
         <StageContent
