@@ -72,9 +72,13 @@ function LeaveIcon() {
 }
 
 export default function CallControls({ onSkip, onLeave, isBusy = false }) {
-  const { useCameraState, useMicrophoneState } = useCallStateHooks();
-  const { camera, isMute: isCameraMuted } = useCameraState();
-  const { microphone, isMute: isMicrophoneMuted } = useMicrophoneState();
+  const callStateHooks = useCallStateHooks();
+  const useCameraState = callStateHooks?.useCameraState;
+  const useMicrophoneState = callStateHooks?.useMicrophoneState;
+  const cameraState = useCameraState ? useCameraState() : { camera: { toggle: () => {} }, isMute: true };
+  const microphoneState = useMicrophoneState ? useMicrophoneState() : { microphone: { toggle: () => {} }, isMute: true };
+  const { camera, isMute: isCameraMuted } = cameraState;
+  const { microphone, isMute: isMicrophoneMuted } = microphoneState;
 
   return (
     <div className="flex w-full flex-wrap items-center justify-center gap-2 sm:gap-3">

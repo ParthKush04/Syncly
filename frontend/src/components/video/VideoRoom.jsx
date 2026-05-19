@@ -170,10 +170,8 @@ function StageContent({ status, participants, primaryParticipant, selfParticipan
     return <WaitingPanel onJoin={null} joining={false} status={status} />;
   }
 
-  if (participants.length > 2) {
-    return <ResponsiveGrid participants={participants} />;
-  }
-
+  // Enforce two-person layout: pick primary + self and ignore extra participants.
+  // This emulates an OmeTV-style room where only two participants are visible.
   return <TwoPersonLayout primaryParticipant={primaryParticipant} selfParticipant={selfParticipant} isMobile={isMobile} />;
 }
 
