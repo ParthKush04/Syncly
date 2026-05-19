@@ -303,8 +303,11 @@ function VideoStage({
 
 export default function VideoRoom({
   onJoin = null,
+  onSkip = null,
+  onLeave = null,
   joining = false,
-  status = 'ready'
+  status = 'ready',
+  isExitingCall = false
 }) {
   const { client, call } = useStreamVideoSession();
 
@@ -346,7 +349,7 @@ export default function VideoRoom({
                 {/* Controls rendered inside StreamTheme so SDK hooks are available */}
                 <div className="pointer-events-auto absolute left-0 right-0 bottom-4 flex justify-center px-4">
                   <div className="w-full max-w-6xl rounded-[1.75rem] border border-white/10 bg-slate-950/80 p-3 shadow-2xl shadow-black/35 backdrop-blur-2xl">
-                    <CallControls />
+                    <CallControls onSkip={onSkip} onLeave={onLeave} isBusy={isExitingCall} />
                   </div>
                 </div>
               </StreamTheme>

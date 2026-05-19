@@ -128,10 +128,14 @@ export default function VideoCallPage() {
         </header>
 
         <div className="relative min-h-0">
-          <VideoRoom joining={status === 'joining'} status={callStatusLabel} />
+          <VideoRoom
+            joining={status === 'joining'}
+            status={callStatusLabel}
+            onSkip={handleSkip}
+            onLeave={handleLeave}
+            isExitingCall={isExitingCall}
+          />
         </div>
-
-        <footer className="flex justify-center pb-[calc(env(safe-area-inset-bottom)+0.25rem)]" />
 
         {error ? (
           <div className="pointer-events-none fixed left-1/2 top-20 z-30 w-[min(92vw,32rem)] -translate-x-1/2 rounded-2xl border border-rose-400/25 bg-rose-500/15 px-4 py-3 text-sm text-rose-100 shadow-2xl shadow-black/30 backdrop-blur-xl">
