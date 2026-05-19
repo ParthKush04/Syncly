@@ -37,7 +37,8 @@ export default function Benefits() {
               key={benefit.title}
               className="rounded-[1.75rem] border border-white/12 bg-white/10 p-6 shadow-sm backdrop-blur-md"
             >
-              <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-sky-400 via-orange-400 to-fuchsia-500" />
+              <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-sky-400 via-fuchsia-400 to-violet-500" />
+                            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-sky-400 via-fuchsia-400 to-violet-500" />
               <h3 className="mt-5 text-xl font-semibold text-white">{benefit.title}</h3>
               <p className="mt-3 text-sm leading-7 text-white/72">{benefit.text}</p>
             </article>

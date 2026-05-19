@@ -10,7 +10,8 @@ export default function SearchingOrb() {
       <div className="absolute h-44 w-44 animate-pulse rounded-full border border-cyan-200/35 bg-[radial-gradient(circle_at_top,rgba(125,211,252,0.52),rgba(59,130,246,0.2),transparent_72%)] shadow-[0_0_90px_rgba(56,189,248,0.32)]" />
       <div className="absolute h-56 w-56 rounded-full border border-white/10 animate-float-soft" />
       <div className="absolute left-1/2 top-6 h-3 w-3 -translate-x-1/2 rounded-full bg-white shadow-[0_0_24px_rgba(255,255,255,0.95)] animate-pulse" />
-      <div className="absolute right-10 top-16 h-2.5 w-2.5 rounded-full bg-orange-300 shadow-[0_0_20px_rgba(253,186,116,0.95)] animate-pulse" style={{ animationDelay: '350ms' }} />
+      <div className="absolute right-10 top-16 h-2.5 w-2.5 rounded-full bg-cyan-300 shadow-[0_0_20px_rgba(165,243,252,0.95)] animate-pulse" style={{ animationDelay: '350ms' }} />
+        <div className="absolute right-10 top-16 h-2.5 w-2.5 rounded-full bg-cyan-300 shadow-[0_0_20px_rgba(165,243,252,0.95)] animate-pulse" style={{ animationDelay: '350ms' }} />
       <div className="absolute bottom-14 left-12 h-2.5 w-2.5 rounded-full bg-fuchsia-300 shadow-[0_0_20px_rgba(244,114,182,0.95)] animate-pulse" style={{ animationDelay: '700ms' }} />
 
       <div className="relative z-10 grid place-items-center text-center">

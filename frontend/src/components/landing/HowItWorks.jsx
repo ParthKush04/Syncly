@@ -36,7 +36,8 @@ export default function HowItWorks() {
               key={item.step}
               className="relative overflow-hidden rounded-[1.75rem] border border-white/12 bg-white/10 p-6 shadow-sm backdrop-blur-md"
             >
-              <div className="absolute right-0 top-0 h-24 w-24 rounded-full bg-gradient-to-br from-sky-400/25 via-orange-400/20 to-fuchsia-500/20 blur-2xl" />
+              <div className="absolute right-0 top-0 h-24 w-24 rounded-full bg-gradient-to-br from-sky-400/25 via-fuchsia-400/20 to-violet-500/20 blur-2xl" />
+                            <div className="absolute right-0 top-0 h-24 w-24 rounded-full bg-gradient-to-br from-sky-400/25 via-fuchsia-400/20 to-violet-500/20 blur-2xl" />
               <p className="text-sm font-semibold tracking-[0.35em] text-white/70">{item.step}</p>
               <h3 className="mt-4 text-2xl font-semibold text-white">{item.title}</h3>
               <p className="mt-4 text-sm leading-7 text-white/72">{item.text}</p>

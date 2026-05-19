@@ -22,7 +22,7 @@ export default function ConnectionStatusBadge() {
         <span className="font-semibold text-white">{participants.length}</span>
       </div>
       {isAutoplayBlocked ? (
-        <div className="rounded-2xl border border-amber-300/20 bg-amber-400/10 px-4 py-3 text-amber-100">
+        <div className="rounded-2xl border border-cyan-300/20 bg-cyan-400/10 px-4 py-3 text-cyan-100">
           Audio playback is blocked by the browser until the next user interaction.
         </div>
       ) : null}

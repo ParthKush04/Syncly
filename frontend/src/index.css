@@ -18,10 +18,10 @@ body,
 body {
   background:
     radial-gradient(circle at top left, rgba(56, 189, 248, 0.2), transparent 24%),
-    radial-gradient(circle at top right, rgba(251, 146, 60, 0.18), transparent 22%),
-    radial-gradient(circle at bottom left, rgba(236, 72, 153, 0.14), transparent 24%),
-    radial-gradient(circle at bottom right, rgba(168, 85, 247, 0.16), transparent 24%),
-    linear-gradient(135deg, #020617 0%, #0b1227 28%, #2a1d5d 54%, #8b2e11 78%, #020617 100%);
+    radial-gradient(circle at top right, rgba(236, 72, 153, 0.16), transparent 22%),
+    radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.14), transparent 24%),
+    radial-gradient(circle at bottom right, rgba(168, 85, 247, 0.18), transparent 24%),
+    linear-gradient(135deg, #020617 0%, #0b1227 28%, #1d2b5c 54%, #312e81 78%, #020617 100%);
   color: #ffffff;
 }
 

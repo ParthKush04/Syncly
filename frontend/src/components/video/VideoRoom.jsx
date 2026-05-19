@@ -141,14 +141,11 @@ function ResponsiveGrid({ participants }) {
   );
 }
 
-function SpotlightLayout({ primaryParticipant, selfParticipant, isMobile }) {
+function TwoPersonLayout({ primaryParticipant, selfParticipant, isMobile }) {
   if (isMobile) {
     return (
-      <div className="flex h-full min-h-0 flex-col gap-3">
-        <div className="flex-1 min-h-[48vh]">
-          <VideoFrame participant={primaryParticipant} label={primaryParticipant?.isLocalParticipant ? 'You' : 'Main speaker'} size="hero" />
-        </div>
-
+      <div className="flex h-full min-h-0 flex-col gap-4">
+        <VideoFrame participant={primaryParticipant} label={primaryParticipant?.isLocalParticipant ? 'You' : 'Remote participant'} size="hero" />
         {selfParticipant ? (
           <VideoFrame participant={selfParticipant} label="Self preview" size="preview" overlay />
         ) : null}
@@ -157,14 +154,13 @@ function SpotlightLayout({ primaryParticipant, selfParticipant, isMobile }) {
   }
 
   return (
-    <div className="relative h-full min-h-0 w-full">
-      <VideoFrame participant={primaryParticipant} label={primaryParticipant?.isLocalParticipant ? 'You' : 'Main speaker'} size="hero" />
-
+    <div className="grid h-full min-h-0 w-full grid-cols-1 gap-4 lg:grid-cols-2 lg:auto-rows-fr">
+      <VideoFrame participant={primaryParticipant} label={primaryParticipant?.isLocalParticipant ? 'You' : 'Remote participant'} size="hero" />
       {selfParticipant ? (
-        <div className="absolute bottom-4 right-4 z-10 w-[clamp(220px,18vw,320px)]">
-          <VideoFrame participant={selfParticipant} label="Self preview" size="preview" overlay />
-        </div>
-      ) : null}
+        <VideoFrame participant={selfParticipant} label="Self preview" size="hero" />
+      ) : (
+        <VideoFrame participant={null} label="Waiting for you" size="hero" />
+      )}
     </div>
   );
 }
@@ -178,7 +174,7 @@ function StageContent({ status, participants, primaryParticipant, selfParticipan
     return <ResponsiveGrid participants={participants} />;
   }
 
-  return <SpotlightLayout primaryParticipant={primaryParticipant} selfParticipant={selfParticipant} isMobile={isMobile} />;
+  return <TwoPersonLayout primaryParticipant={primaryParticipant} selfParticipant={selfParticipant} isMobile={isMobile} />;
 }
 
 function VideoStage({ status }) {
