@@ -15,7 +15,7 @@ function useViewportWidth() {
   return width;
 }
 
-function getParticipantLabel(participant) {
+function getDisplayName(participant) {
   return String(participant?.name || participant?.userId || (participant?.isLocalParticipant ? 'You' : 'Participant') || '').trim();
 }
 
@@ -53,15 +53,20 @@ function WaitingPanel({ onJoin, joining, status }) {
   );
 }
 
-function VideoCard({ participant, label, variant = 'main', subdued = false }) {
-  const name = getParticipantLabel(participant);
+function VideoFrame({ participant, label, size = 'hero', overlay = false }) {
+  const name = getDisplayName(participant);
   const initials = getInitials(name);
+
+  const sizeClass =
+    size === 'grid'
+      ? 'aspect-video min-h-0'
+      : size === 'preview'
+        ? 'aspect-video min-h-[clamp(180px,22vw,280px)] w-full'
+        : 'aspect-video h-full w-full min-h-0';
 
   return (
     <div
-      className={`relative overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/90 shadow-2xl shadow-black/35 backdrop-blur-xl ${
-        variant === 'grid' ? 'aspect-video min-h-0' : 'h-full min-h-0 w-full'
-      } ${subdued ? 'opacity-95' : ''}`}
+      className={`relative overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/90 shadow-2xl shadow-black/35 backdrop-blur-xl ${sizeClass} ${overlay ? 'ring-1 ring-white/10' : ''}`}
     >
       {participant ? (
         <ParticipantView
@@ -72,7 +77,7 @@ function VideoCard({ participant, label, variant = 'main', subdued = false }) {
           className="absolute inset-0 h-full w-full [&_video]:h-full [&_video]:w-full [&_video]:object-cover"
         />
       ) : (
-        <div className="absolute inset-0 grid place-items-center bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_35%),linear-gradient(180deg,rgba(2,6,23,0.9),rgba(15,23,42,0.9))]">
+        <div className="absolute inset-0 grid place-items-center bg-[radial-gradient(circle_at_top,rgba(34,211,236,0.16),transparent_35%),linear-gradient(180deg,rgba(2,6,23,0.9),rgba(15,23,42,0.9))]">
           <div className="grid place-items-center gap-3 text-center">
             <div className="grid h-20 w-20 place-items-center rounded-[1.5rem] border border-white/10 bg-white/5 text-xl font-semibold text-white/80">
               {initials || '??'}
@@ -82,7 +87,7 @@ function VideoCard({ participant, label, variant = 'main', subdued = false }) {
         </div>
       )}
 
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,6,23,0.04)_0%,rgba(2,6,23,0.08)_40%,rgba(2,6,23,0.9)_100%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,6,23,0.02)_0%,rgba(2,6,23,0.08)_40%,rgba(2,6,23,0.92)_100%)]" />
 
       <div className="absolute left-4 top-4 rounded-full border border-white/10 bg-black/30 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-white/85 backdrop-blur-sm">
         {label}
@@ -93,25 +98,13 @@ function VideoCard({ participant, label, variant = 'main', subdued = false }) {
           <p className="text-xs uppercase tracking-[0.35em] text-cyan-200/90">
             {participant?.isLocalParticipant ? 'You' : 'Remote participant'}
           </p>
-          <h3 className={`mt-2 truncate font-semibold text-white ${variant === 'grid' ? 'text-lg' : 'text-2xl'}`}>
+          <h3 className={`mt-2 truncate font-semibold text-white ${size === 'grid' ? 'text-lg' : 'text-2xl'}`}>
             {name || 'Participant'}
           </h3>
         </div>
         <div className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-semibold text-white/85 backdrop-blur-sm">
           Live
         </div>
-      </div>
-    </div>
-  );
-}
-
-function TilePlaceholder({ title, subtitle }) {
-  return (
-    <div className="flex h-full w-full min-h-[40vh] min-w-0 items-center justify-center rounded-[2rem] border border-dashed border-white/12 card-dark p-6 text-center text-white/80 shadow-2xl shadow-black/20 lg:min-h-0">
-      <div>
-        <p className="text-xs uppercase tracking-[0.45em] text-cyan-200/80">Waiting</p>
-        <h3 className="mt-3 text-2xl font-semibold text-white">{title}</h3>
-        <p className="mt-3 max-w-xs text-sm leading-7 text-slate-300">{subtitle}</p>
       </div>
     </div>
   );
@@ -133,72 +126,62 @@ function VideoStageHeader({ status, participantCount, layoutMode }) {
   );
 }
 
-function MobileSpotlightLayout({ primaryParticipant, selfParticipant, secondaryParticipant }) {
+function ResponsiveGrid({ participants }) {
   return (
-    <div className="flex h-full min-h-0 flex-col gap-3">
-      <div className="min-h-[48vh] flex-1">
-        <VideoCard participant={primaryParticipant} label={primaryParticipant?.isLocalParticipant ? 'You' : 'Main speaker'} variant="main" />
-      </div>
-
-      {selfParticipant || secondaryParticipant ? (
-        <div className="grid gap-3 sm:grid-cols-2">
-          {selfParticipant ? <VideoCard participant={selfParticipant} label="Self preview" variant="grid" subdued /> : null}
-          {secondaryParticipant ? <VideoCard participant={secondaryParticipant} label="Next participant" variant="grid" subdued /> : null}
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-function DesktopSpotlightLayout({ primaryParticipant, selfParticipant }) {
-  return (
-    <div className="relative h-full min-h-0 w-full">
-      <div className="h-full min-h-[min(62vh,48rem)] w-full">
-        <VideoCard participant={primaryParticipant} label={primaryParticipant?.isLocalParticipant ? 'You' : 'Main speaker'} variant="main" />
-      </div>
-
-      {selfParticipant ? (
-        <div className="absolute bottom-4 right-4 z-10 w-[clamp(170px,20vw,280px)]">
-          <VideoCard participant={selfParticipant} label="Self preview" variant="grid" subdued />
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-function ParticipantGrid({ participants }) {
-  return (
-    <div className="grid h-full min-h-0 w-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3 auto-rows-fr">
+    <div className="grid h-full min-h-0 w-full grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3 auto-rows-fr">
       {participants.map((participant) => (
-        <VideoCard
+        <VideoFrame
           key={participant.sessionId || participant.userId || participant.id}
           participant={participant}
           label={participant.isLocalParticipant ? 'You' : participant.isDominantSpeaker ? 'Active speaker' : 'Participant'}
-          variant="grid"
+          size="grid"
         />
       ))}
     </div>
   );
 }
 
-function StageContent({ status, participants, primaryParticipant, selfParticipant, secondaryParticipant, isMobile, layoutMode }) {
+function SpotlightLayout({ primaryParticipant, selfParticipant, isMobile }) {
+  if (isMobile) {
+    return (
+      <div className="flex h-full min-h-0 flex-col gap-3">
+        <div className="flex-1 min-h-[48vh]">
+          <VideoFrame participant={primaryParticipant} label={primaryParticipant?.isLocalParticipant ? 'You' : 'Main speaker'} size="hero" />
+        </div>
+
+        {selfParticipant ? (
+          <VideoFrame participant={selfParticipant} label="Self preview" size="preview" overlay />
+        ) : null}
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative h-full min-h-0 w-full">
+      <VideoFrame participant={primaryParticipant} label={primaryParticipant?.isLocalParticipant ? 'You' : 'Main speaker'} size="hero" />
+
+      {selfParticipant ? (
+        <div className="absolute bottom-4 right-4 z-10 w-[clamp(220px,18vw,320px)]">
+          <VideoFrame participant={selfParticipant} label="Self preview" size="preview" overlay />
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function StageContent({ status, participants, primaryParticipant, selfParticipant, isMobile }) {
   if (!participants.length) {
     return <WaitingPanel onJoin={null} joining={false} status={status} />;
   }
 
   if (participants.length > 2) {
-    return <ParticipantGrid participants={participants} />;
+    return <ResponsiveGrid participants={participants} />;
   }
 
-  if (isMobile) {
-    return <MobileSpotlightLayout primaryParticipant={primaryParticipant} selfParticipant={selfParticipant} secondaryParticipant={secondaryParticipant} />;
-  }
-
-  return <DesktopSpotlightLayout primaryParticipant={primaryParticipant} selfParticipant={selfParticipant} />;
+  return <SpotlightLayout primaryParticipant={primaryParticipant} selfParticipant={selfParticipant} isMobile={isMobile} />;
 }
 
-export default function VideoRoom({ onJoin = null, joining = false, status = 'ready' }) {
-  const { client, call } = useStreamVideoSession();
+function VideoStage({ status }) {
   const { useParticipants, useCallCallingState } = useCallStateHooks();
   const participants = useParticipants();
   const callingState = useCallCallingState();
@@ -206,7 +189,7 @@ export default function VideoRoom({ onJoin = null, joining = false, status = 're
   const viewportWidth = useViewportWidth();
   const isMobile = viewportWidth > 0 && viewportWidth < 768;
 
-  const { orderedParticipants, localParticipant, remoteParticipants, primaryParticipant, selfParticipant, secondaryParticipant, layoutMode } = useMemo(() => {
+  const { orderedParticipants, primaryParticipant, selfParticipant, layoutMode } = useMemo(() => {
     const nextParticipants = [...participants].sort((left, right) => {
       if (left.isLocalParticipant && !right.isLocalParticipant) {
         return 1;
@@ -235,33 +218,26 @@ export default function VideoRoom({ onJoin = null, joining = false, status = 're
       nextLocalParticipant ||
       null;
 
-    const nextSelfParticipant = nextLocalParticipant && nextPrimaryParticipant?.sessionId !== nextLocalParticipant.sessionId ? nextLocalParticipant : null;
-    const nextSecondaryParticipant = nextRemoteParticipants.find((participant) => participant.sessionId !== nextPrimaryParticipant?.sessionId) || null;
-
     return {
       orderedParticipants: nextParticipants,
-      localParticipant: nextLocalParticipant,
-      remoteParticipants: nextRemoteParticipants,
       primaryParticipant: nextPrimaryParticipant,
-      selfParticipant: nextSelfParticipant,
-      secondaryParticipant: nextSecondaryParticipant,
+      selfParticipant:
+        nextLocalParticipant && nextPrimaryParticipant?.sessionId !== nextLocalParticipant.sessionId ? nextLocalParticipant : null,
       layoutMode: nextParticipants.length > 2 ? 'Grid layout' : isMobile ? 'Mobile stack' : 'Spotlight'
     };
   }, [dominantSpeaker, isMobile, participants]);
 
   return (
     <div className="flex h-full min-h-0 w-full flex-col gap-3">
-      <VideoStageHeader status={status} participantCount={participants.length} layoutMode={layoutMode} />
+      <VideoStageHeader status={callingState || status} participantCount={participants.length} layoutMode={layoutMode} />
 
       <div className="relative min-h-0 flex-1">
         <StageContent
-          status={status}
+          status={callingState || status}
           participants={orderedParticipants}
           primaryParticipant={primaryParticipant}
           selfParticipant={selfParticipant}
-          secondaryParticipant={secondaryParticipant}
           isMobile={isMobile}
-          layoutMode={layoutMode}
         />
       </div>
     </div>
@@ -291,7 +267,7 @@ export default function VideoRoom({ onJoin = null, joining = false, status = 're
         {call ? (
           <StreamCall call={call}>
             <StreamTheme>
-              <StageView />
+              <VideoStage onJoin={onJoin} joining={joining} status={status} />
             </StreamTheme>
           </StreamCall>
         ) : (
