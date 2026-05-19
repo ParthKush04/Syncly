@@ -69,8 +69,8 @@ function VideoFrame({ participant, label, size = 'hero', overlay = false }) {
     <div
       className={`relative overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/90 shadow-2xl shadow-black/35 backdrop-blur-xl ${sizeClass} ${overlay ? 'ring-1 ring-white/10' : ''}`}
     >
-      {participant ? (
-        <ParticipantView
+      {participant?.videoStream || participant?.publishedTracks ? (
+  <ParticipantView
           participant={participant}
           trackType="videoTrack"
           mirror={Boolean(participant?.isLocalParticipant)}
