@@ -96,8 +96,8 @@ function VideoFrame({
 
   const sizeClass =
     size === 'preview'
-      ? 'aspect-video w-full min-h-[180px]'
-      : 'h-full w-full';
+      ? 'aspect-video w-full min-h-[10rem] sm:min-h-[12rem] md:min-h-[14rem]'
+      : 'aspect-video w-full min-h-[22rem] sm:min-h-[26rem] md:min-h-[30rem] lg:min-h-[34rem]';
 
   return (
     <div
@@ -187,7 +187,7 @@ function TwoPersonLayout({
   selfParticipant
 }) {
   return (
-    <div className="grid h-full w-full grid-cols-1 gap-4 lg:grid-cols-2">
+    <div className="grid h-full w-full grid-cols-1 gap-3 md:grid-cols-2 lg:gap-4 items-stretch">
       <div className="min-h-0">
         <VideoFrame
           participant={primaryParticipant}
@@ -336,17 +336,9 @@ export default function VideoRoom({
     return (
       <div className="grid h-full w-full flex-1 place-items-center rounded-[2rem] border border-white/10 bg-slate-950/90 p-6 text-center text-white shadow-2xl shadow-black/30">
         <div className="max-w-md">
-          <p className="text-xs uppercase tracking-[0.45em] text-cyan-300">
-            Video room
-          </p>
-
-          <h2 className="mt-3 text-3xl font-semibold text-white">
-            Preparing your call experience
-          </h2>
-
-          <p className="mt-4 text-sm leading-7 text-slate-300">
-            The Stream client is not ready yet.
-          </p>
+          <p className="text-xs uppercase tracking-[0.45em] text-cyan-300">Video room</p>
+          <h2 className="mt-3 text-3xl font-semibold text-white">Preparing your call experience</h2>
+          <p className="mt-4 text-sm leading-7 text-slate-300">The Stream client is not ready yet.</p>
         </div>
       </div>
     );
@@ -354,33 +346,26 @@ export default function VideoRoom({
 
   return (
     <section className="relative flex h-full w-full min-h-0 flex-1 items-stretch overflow-hidden rounded-[2.5rem] p-3 shadow-[0_35px_100px_rgba(0,0,0,0.45)] sm:p-4 lg:p-5">
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.16),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.18),transparent_34%),linear-gradient(180deg,rgba(2,6,23,0.96)_0%,rgba(15,23,42,0.96)_100%)]" />
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(34,211,236,0.16),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.18),transparent_34%),linear-gradient(180deg,rgba(2,6,23,0.96)_0%,rgba(15,23,42,0.96)_100%)]" />
 
       <StreamVideo client={client}>
         <ErrorBoundary>
           {call ? (
             <StreamCall call={call}>
               <StreamTheme>
-                <VideoStage
-                  onJoin={onJoin}
-                  joining={joining}
-                  status={status}
-                />
+                <div className="flex h-full min-h-0 w-full flex-col gap-3">
+                  <div className="min-h-0 flex-1">
+                    <VideoStage onJoin={onJoin} joining={joining} status={status} />
+                  </div>
 
-                {/* Controls rendered inside StreamTheme so SDK hooks are available */}
-                <div className="pointer-events-auto absolute left-0 right-0 bottom-4 flex justify-center px-4">
-                  <div className="w-full max-w-6xl rounded-[1.75rem] border border-white/10 bg-slate-950/80 p-3 shadow-2xl shadow-black/35 backdrop-blur-2xl">
+                  <div className="shrink-0 rounded-[1.75rem] border border-white/10 bg-slate-950/80 p-3 shadow-2xl shadow-black/35 backdrop-blur-2xl">
                     <CallControls onSkip={onSkip} onLeave={onLeave} isBusy={isExitingCall} />
                   </div>
                 </div>
               </StreamTheme>
             </StreamCall>
           ) : (
-            <WaitingPanel
-              onJoin={onJoin}
-              joining={joining}
-              status={status}
-            />
+            <WaitingPanel onJoin={onJoin} joining={joining} status={status} />
           )}
         </ErrorBoundary>
       </StreamVideo>
