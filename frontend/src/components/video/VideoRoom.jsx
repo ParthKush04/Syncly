@@ -4,7 +4,7 @@ import { useStreamVideoSession } from '../../context/StreamVideoSessionContext.j
 
 function WaitingPanel({ onJoin, joining, status }) {
   return (
-    <div className="grid h-full min-h-[56vh] place-items-center rounded-[2rem] card-dark p-6 text-center text-white shadow-2xl shadow-black/30 sm:min-h-[68vh] lg:min-h-[78vh]">
+    <div className="grid h-full w-full min-h-[56vh] place-items-center rounded-[2rem] card-dark p-6 text-center text-white shadow-2xl shadow-black/30 sm:min-h-[68vh] lg:min-h-[78vh]">
       <div className="max-w-md">
         <p className="text-xs uppercase tracking-[0.45em] text-cyan-300">Call ready</p>
         <h3 className="mt-3 text-3xl font-semibold tracking-tight text-white">Your session is connected</h3>
@@ -29,7 +29,7 @@ function WaitingPanel({ onJoin, joining, status }) {
 
 function TilePlaceholder({ title, subtitle }) {
   return (
-    <div className="flex h-full min-h-[40vh] items-center justify-center rounded-[2rem] border border-dashed border-white/12 card-dark p-6 text-center text-white/80 shadow-2xl shadow-black/20 lg:min-h-0">
+    <div className="flex h-full w-full min-h-[40vh] min-w-0 items-center justify-center rounded-[2rem] border border-dashed border-white/12 card-dark p-6 text-center text-white/80 shadow-2xl shadow-black/20 lg:min-h-0">
       <div>
         <p className="text-xs uppercase tracking-[0.45em] text-cyan-200/80">Waiting</p>
         <h3 className="mt-3 text-2xl font-semibold text-white">{title}</h3>
@@ -43,13 +43,13 @@ function ParticipantTile({ participant, slotLabel }) {
   const displayName = String(participant?.name || (participant?.isLocalParticipant ? 'You' : 'Participant') || '').trim();
 
   return (
-    <div className="group relative min-h-[40vh] overflow-hidden rounded-[2rem] border border-white/10 card-dark lg:min-h-0">
+    <div className="group relative h-full w-full min-h-[40vh] min-w-0 overflow-hidden rounded-[2rem] border border-white/10 card-dark lg:min-h-0">
       <ParticipantView
         participant={participant}
         trackType="videoTrack"
         mirror={Boolean(participant?.isLocalParticipant)}
         ParticipantViewUI={null}
-        className="absolute inset-0"
+        className="absolute inset-0 h-full w-full"
       />
 
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,6,23,0.08)_0%,rgba(2,6,23,0.14)_35%,rgba(2,6,23,0.9)_100%)]" />
@@ -83,13 +83,13 @@ function StageView() {
   }, [participants]);
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-3">
+    <div className="flex h-full w-full min-h-0 flex-col gap-3">
       <div className="flex items-center justify-between gap-3 rounded-[1.5rem] border border-white/10 card-dark px-4 py-3 text-sm text-white/80 backdrop-blur-sm">
         <span className="uppercase tracking-[0.35em] text-cyan-200/90">{callingState}</span>
         <span>{participants.length} participant(s)</span>
       </div>
 
-        <div className="grid flex-1 min-h-0 gap-3 grid-cols-1 lg:grid-cols-2">
+      <div className="grid flex-1 min-h-0 w-full items-stretch gap-3 grid-cols-1 lg:grid-cols-2 lg:auto-rows-fr">
         {localParticipant ? (
           <ParticipantTile participant={localParticipant} slotLabel="Your screen" />
         ) : (
@@ -111,7 +111,7 @@ export default function VideoRoom({ onJoin = null, joining = false, status = 're
 
   if (!client) {
     return (
-      <div className="grid flex-1 place-items-center rounded-[2rem] border border-white/10 bg-slate-950/90 p-6 text-center text-white shadow-2xl shadow-black/30">
+      <div className="grid h-full w-full flex-1 place-items-center rounded-[2rem] border border-white/10 bg-slate-950/90 p-6 text-center text-white shadow-2xl shadow-black/30">
         <div className="max-w-md">
           <p className="text-xs uppercase tracking-[0.45em] text-cyan-300">Video room</p>
           <h2 className="mt-3 text-3xl font-semibold text-white">Preparing your call experience</h2>
@@ -122,7 +122,7 @@ export default function VideoRoom({ onJoin = null, joining = false, status = 're
   }
 
   return (
-    <section className="relative flex w-full h-full min-h-0 flex-1 overflow-hidden rounded-[2.5rem] card-dark-strong p-3 shadow-[0_35px_100px_rgba(0,0,0,0.45)] sm:p-4 lg:p-5">
+    <section className="relative flex w-full h-full min-h-0 flex-1 items-stretch overflow-hidden rounded-[2.5rem] card-dark-strong p-3 shadow-[0_35px_100px_rgba(0,0,0,0.45)] sm:p-4 lg:p-5">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.16),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.18),transparent_34%),linear-gradient(180deg,rgba(2,6,23,0.96)_0%,rgba(15,23,42,0.96)_100%)]" />
 
       <StreamVideo client={client}>
