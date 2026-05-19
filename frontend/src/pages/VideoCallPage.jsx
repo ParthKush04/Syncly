@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Logo from '../components/branding/Logo.jsx';
-import CallControls from '../components/videoCall/CallControls.jsx';
 import VideoRoom from '../components/video/VideoRoom.jsx';
 import { useStreamVideoSession } from '../context/StreamVideoSessionContext.jsx';
 
@@ -132,11 +131,7 @@ export default function VideoCallPage() {
           <VideoRoom joining={status === 'joining'} status={callStatusLabel} />
         </div>
 
-        <footer className="flex justify-center pb-[calc(env(safe-area-inset-bottom)+0.25rem)]">
-          <div className="w-full max-w-6xl rounded-[1.75rem] border border-white/10 bg-slate-950/80 p-3 shadow-2xl shadow-black/35 backdrop-blur-2xl">
-            <CallControls onSkip={handleSkip} onLeave={handleLeave} isBusy={isExitingCall} />
-          </div>
-        </footer>
+        <footer className="flex justify-center pb-[calc(env(safe-area-inset-bottom)+0.25rem)]" />
 
         {error ? (
           <div className="pointer-events-none fixed left-1/2 top-20 z-30 w-[min(92vw,32rem)] -translate-x-1/2 rounded-2xl border border-rose-400/25 bg-rose-500/15 px-4 py-3 text-sm text-rose-100 shadow-2xl shadow-black/30 backdrop-blur-xl">

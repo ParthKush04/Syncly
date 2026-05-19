@@ -8,6 +8,7 @@ import {
 } from '@stream-io/video-react-sdk';
 
 import ErrorBoundary from '../common/ErrorBoundary.jsx';
+import CallControls from '../videoCall/CallControls.jsx';
 import { useStreamVideoSession } from '../../context/StreamVideoSessionContext.jsx';
 
 function useViewportWidth() {
@@ -392,6 +393,13 @@ export default function VideoRoom({
                   joining={joining}
                   status={status}
                 />
+
+                {/* Controls rendered inside StreamTheme so SDK hooks are available */}
+                <div className="pointer-events-auto absolute left-0 right-0 bottom-4 flex justify-center px-4">
+                  <div className="w-full max-w-6xl rounded-[1.75rem] border border-white/10 bg-slate-950/80 p-3 shadow-2xl shadow-black/35 backdrop-blur-2xl">
+                    <CallControls />
+                  </div>
+                </div>
               </StreamTheme>
             </StreamCall>
           ) : (
