@@ -183,8 +183,8 @@ export default function MatchmakingWaitPage() {
           <Logo compact className="mb-5" tone="light" />
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-sm uppercase tracking-[0.35em] text-cyan-700">Matchmaking queue</p>
-              <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">We’re finding a great connection</h1>
+              <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">Matchmaking queue</p>
+              <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">We’re finding a great connection</h1>
             </div>
 
             <div className="rounded-full border border-emerald-100 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">
@@ -218,11 +218,10 @@ export default function MatchmakingWaitPage() {
             value="Searching for a match"
             description="Your profile is live in the queue and being compared with professionals who share your goals and interests."
           />
-
-          <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/80">
+          <section className="rounded-[2rem] card-dark p-6 shadow-lg shadow-black/25">
             <div className="flex items-center justify-between gap-4">
-              <h2 className="text-lg font-semibold text-slate-900">Matching preferences</h2>
-              <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-500">Smart filter</span>
+              <h2 className="text-lg font-semibold text-white">Matching preferences</h2>
+              <span className="rounded-full border border-white/10 bg-[rgba(255,255,255,0.03)] px-3 py-1 text-xs text-white/70">Smart filter</span>
             </div>
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -232,10 +231,10 @@ export default function MatchmakingWaitPage() {
             </div>
           </section>
 
-          <section className="rounded-[2rem] border border-slate-200 bg-gradient-to-br from-cyan-50 via-white to-blue-50 p-6 shadow-2xl shadow-slate-200/80">
-            <p className="text-sm uppercase tracking-[0.35em] text-cyan-700">Queue controls</p>
-            <h2 className="mt-3 text-2xl font-semibold text-slate-900">Ready to stop searching?</h2>
-            <p className="mt-3 text-sm leading-7 text-slate-600">
+          <section className="rounded-[2rem] card-dark-strong p-6 shadow-2xl shadow-black/30">
+            <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">Queue controls</p>
+            <h2 className="mt-3 text-2xl font-semibold text-white">Ready to stop searching?</h2>
+            <p className="mt-3 text-sm leading-7 text-white/75">
               You can leave the matchmaking queue at any time and return when you’re ready to connect again.
             </p>
 
