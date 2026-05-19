@@ -17,7 +17,7 @@ function ToggleButton({ active, label, onClick }) {
   );
 }
 
-export default function CallControlsPanel({ onLeave }) {
+export default function CallControlsPanel({ onSkip, onLeaveToDashboard, onLeave, isExitingCall = false }) {
   const call = useCall();
   const { useCameraState, useMicrophoneState } = useCallStateHooks();
   const { camera, isMute: isCameraMuted } = useCameraState();
@@ -62,8 +62,17 @@ export default function CallControlsPanel({ onLeave }) {
       <ToggleButton active={!isCameraMuted} label={isCameraMuted ? 'Camera off' : 'Camera on'} onClick={() => camera.toggle()} />
       <button
         type="button"
-        onClick={handleLeave}
-        className="rounded-2xl bg-rose-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-rose-400"
+        onClick={onSkip}
+        disabled={isExitingCall || leavingRef.current}
+        className="rounded-2xl border border-cyan-200 bg-cyan-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {isExitingCall ? 'Processing...' : 'Skip'}
+      </button>
+      <button
+        type="button"
+        onClick={onLeaveToDashboard || handleLeave}
+        disabled={isExitingCall || leavingRef.current}
+        className="rounded-2xl bg-rose-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-rose-400 disabled:cursor-not-allowed disabled:opacity-60"
       >
         Leave call
       </button>

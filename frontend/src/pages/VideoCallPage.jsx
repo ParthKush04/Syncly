@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import CallHeader from '../components/videoCall/CallHeader.jsx';
 import VideoPane from '../components/videoCall/VideoPane.jsx';
 import CallControls from '../components/videoCall/CallControls.jsx';
@@ -13,12 +13,13 @@ function formatTime(seconds) {
 }
 
 export default function VideoCallPage() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { ensureSessionAndJoin, status, error, setError, isInCall, setCallId, setCallType } = useStreamVideoSession();
-  const [isMuted, setIsMuted] = useState(false);
-  const [isCameraOff, setIsCameraOff] = useState(false);
+  const { ensureSessionAndJoin, status, error, setError, isInCall, setCallId, setCallType, leaveCall, disconnect } = useStreamVideoSession();
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [isExitingCall, setIsExitingCall] = useState(false);
   const lastJoinKeyRef = useRef('');
+  const exitInProgressRef = useRef(false);
 
   useEffect(() => {
     const token = localStorage.getItem('synclyToken');
@@ -93,10 +94,39 @@ export default function VideoCallPage() {
 
   const sessionTime = useMemo(() => formatTime(elapsedSeconds), [elapsedSeconds]);
 
-  const handleLeave = () => {
-    setElapsedSeconds(0);
-    setIsMuted(false);
-    setIsCameraOff(false);
+  const exitCallAndNavigate = async (destination, reason) => {
+    if (exitInProgressRef.current) {
+      return;
+    }
+
+    exitInProgressRef.current = true;
+    setIsExitingCall(true);
+
+    try {
+      console.log('[video-call] exit flow start', { destination, reason });
+      await leaveCall();
+      await disconnect();
+      console.log('[video-call] exit flow success', { destination, reason });
+    } catch (exitError) {
+      console.error('[video-call] exit flow failed', {
+        destination,
+        reason,
+        message: exitError instanceof Error ? exitError.message : exitError
+      });
+    } finally {
+      setElapsedSeconds(0);
+      setIsExitingCall(false);
+      exitInProgressRef.current = false;
+      navigate(destination, { replace: true });
+    }
+  };
+
+  const handleSkip = async () => {
+    await exitCallAndNavigate('/matchmaking', 'skip');
+  };
+
+  const handleLeaveToDashboard = async () => {
+    await exitCallAndNavigate('/dashboard', 'leave-dashboard');
   };
 
   return (
@@ -106,7 +136,7 @@ export default function VideoCallPage() {
 
         <section className="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(320px,0.8fr)]">
           <div className="grid gap-6">
-            <VideoRoom />
+            <VideoRoom onSkip={handleSkip} onLeaveToDashboard={handleLeaveToDashboard} isExitingCall={isExitingCall} />
 
             <div className="grid gap-6 sm:grid-cols-2">
               <VideoPane title="Your camera" subtitle="Previewing local audio and video" accent="emerald" isLocal={true} />
@@ -115,8 +145,8 @@ export default function VideoCallPage() {
                 <p className="text-sm uppercase tracking-[0.35em] text-cyan-700">Session details</p>
                 <div className="mt-4 space-y-3 text-sm text-slate-600">
                   <InfoRow label="Session timer" value={sessionTime} />
-                  <InfoRow label="Status" value={isMuted ? 'Muted' : 'Speaking'} />
-                  <InfoRow label="Camera" value={isCameraOff ? 'Off' : 'On'} />
+                  <InfoRow label="Status" value={isInCall ? 'In call' : status} />
+                  <InfoRow label="Camera" value={isInCall ? 'Live' : 'Waiting'} />
                   <InfoRow label="Connection" value="Stable" />
                 </div>
               </aside>
@@ -139,11 +169,9 @@ export default function VideoCallPage() {
             </section>
 
             <CallControls
-              isMuted={isMuted}
-              isCameraOff={isCameraOff}
-              onToggleMute={() => setIsMuted((current) => !current)}
-              onToggleCamera={() => setIsCameraOff((current) => !current)}
-              onLeave={handleLeave}
+              onSkip={handleSkip}
+              onLeave={handleLeaveToDashboard}
+              isBusy={isExitingCall}
             />
 
             <div className="rounded-[2rem] border border-cyan-100 bg-cyan-50 p-5 text-sm leading-7 text-cyan-900">

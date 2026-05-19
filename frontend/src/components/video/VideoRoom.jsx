@@ -1,4 +1,4 @@
-import { StreamCall, StreamTheme, SpeakerLayout, StreamVideo, useCallStateHooks } from '@stream-io/video-react-sdk';
+import { StreamCall, StreamTheme, PaginatedGridLayout, StreamVideo, useCallStateHooks } from '@stream-io/video-react-sdk';
 import { useStreamVideoSession } from '../../context/StreamVideoSessionContext.jsx';
 import CallControlsPanel from './CallControlsPanel.jsx';
 import ConnectionStatusBadge from './ConnectionStatusBadge.jsx';
@@ -28,33 +28,33 @@ function WaitingPanel({ onJoin, joining }) {
   );
 }
 
-function ActiveCallView({ onLeave }) {
+function ActiveCallView({ onSkip, onLeaveToDashboard, isExitingCall }) {
   const { useParticipants, useCallCallingState } = useCallStateHooks();
   const participants = useParticipants();
   const callingState = useCallCallingState();
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+    <div className="grid gap-5">
       <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-3 shadow-2xl shadow-slate-200/80">
         <div className="mb-3 flex items-center justify-between gap-4 px-2 pt-1 text-sm text-slate-500">
           <span>Call state: {callingState}</span>
           <span>{participants.length} participant(s)</span>
         </div>
-        <div className="overflow-hidden rounded-[1.5rem]">
-          <SpeakerLayout participantBarPosition="right" />
+        <div className="min-h-[62vh] overflow-hidden rounded-[1.5rem] lg:min-h-[70vh] xl:min-h-[74vh]">
+          <PaginatedGridLayout />
         </div>
       </div>
 
-      <div className="grid gap-4 self-start">
+      <div className="grid gap-4">
         <ConnectionStatusBadge />
-        <CallControlsPanel onLeave={onLeave} />
+        <CallControlsPanel onSkip={onSkip} onLeaveToDashboard={onLeaveToDashboard} isExitingCall={isExitingCall} />
       </div>
     </div>
   );
 }
 
-export default function VideoRoom() {
-  const { client, call, joinCall, leaveCall, status } = useStreamVideoSession();
+export default function VideoRoom({ onSkip, onLeaveToDashboard, isExitingCall = false }) {
+  const { client, call, joinCall, status } = useStreamVideoSession();
 
   if (!client) {
     return (
@@ -84,7 +84,7 @@ export default function VideoRoom() {
         {call ? (
           <StreamCall call={call}>
             <StreamTheme>
-              <ActiveCallView onLeave={leaveCall} />
+              <ActiveCallView onSkip={onSkip} onLeaveToDashboard={onLeaveToDashboard} isExitingCall={isExitingCall} />
             </StreamTheme>
           </StreamCall>
         ) : (
