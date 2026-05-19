@@ -96,8 +96,8 @@ function VideoFrame({
 
   const sizeClass =
     size === 'preview'
-      ? 'aspect-[4/5] w-full min-h-[11rem] sm:aspect-video sm:min-h-[12rem] md:min-h-[14rem]'
-      : 'aspect-[4/5] w-full min-h-[18rem] sm:aspect-video sm:min-h-[22rem] md:min-h-[26rem] lg:min-h-[32rem]';
+      ? 'aspect-[4/5] w-full min-h-[12rem] sm:aspect-video sm:min-h-[13rem] md:min-h-[15rem]'
+      : 'aspect-[4/5] w-full min-h-[22rem] sm:aspect-video sm:min-h-[26rem] md:min-h-[30rem] lg:min-h-[36rem]';
 
   return (
     <div
@@ -298,14 +298,6 @@ function VideoStage({
         participantCount={participants.length}
       />
 
-      <div className="shrink-0 rounded-[1.75rem] border border-white/10 bg-slate-950/80 p-3 shadow-2xl shadow-black/35 backdrop-blur-2xl">
-        <div className="overflow-x-auto">
-          <div className="min-w-max">
-            <CallControls onSkip={onSkip} onLeave={onLeave} isBusy={isExitingCall} />
-          </div>
-        </div>
-      </div>
-
       {isAutoplayBlocked ? (
         <div className="flex items-center justify-between gap-3 rounded-[1.25rem] border border-cyan-300/20 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-50">
           <p>Audio is blocked by the browser until you allow playback.</p>
@@ -365,6 +357,10 @@ export default function VideoRoom({
             <StreamCall call={call}>
               <StreamTheme>
                 <div className="flex h-full min-h-0 w-full flex-col gap-3">
+                  <div className="shrink-0 rounded-[1.5rem] border border-white/10 bg-slate-950/80 px-3 py-2 shadow-2xl shadow-black/35 backdrop-blur-2xl sm:px-4">
+                    <CallControls onSkip={onSkip} onLeave={onLeave} isBusy={isExitingCall} />
+                  </div>
+
                   <div className="min-h-0 flex-1">
                     <VideoStage
                       onJoin={onJoin}

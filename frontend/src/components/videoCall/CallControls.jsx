@@ -7,7 +7,7 @@ function IconButton({ label, active, onClick, disabled, children }) {
       aria-label={label}
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex items-center justify-center gap-2 rounded-full border px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 sm:px-5 ${
+      className={`inline-flex shrink-0 items-center justify-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 sm:px-4 sm:py-3 ${
         active
           ? 'border-white/10 bg-white/10 text-white hover:bg-white/15'
           : 'border-white/10 bg-white/5 text-white/80 hover:bg-white/10'
@@ -82,7 +82,7 @@ export default function CallControls({ onSkip, onLeave, isBusy = false }) {
   const { microphone, isMute: isMicrophoneMuted } = microphoneState;
 
   return (
-    <div className="flex w-full flex-wrap items-center justify-center gap-2 sm:gap-3">
+    <div className="flex w-full flex-nowrap items-center justify-start gap-2 overflow-x-auto whitespace-nowrap sm:justify-center sm:gap-3">
       <IconButton label={isMicrophoneMuted ? 'Unmute' : 'Mute'} active={!isMicrophoneMuted} onClick={() => microphone.toggle()} disabled={isBusy}>
         <MicIcon muted={isMicrophoneMuted} />
       </IconButton>
