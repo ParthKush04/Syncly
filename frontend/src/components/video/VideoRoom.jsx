@@ -86,7 +86,8 @@ function VideoFrame({
   participant,
   label,
   size = 'hero',
-  overlay = false
+  overlay = false,
+  mirror = false
 }) {
   const name = getDisplayName(participant);
 
@@ -108,7 +109,7 @@ function VideoFrame({
         <ParticipantView
           participant={participant}
           trackType="videoTrack"
-          mirror={Boolean(participant?.isLocalParticipant)}
+          mirror={mirror}
           ParticipantViewUI={null}
           className="absolute inset-0 h-full w-full [&_video]:h-full [&_video]:w-full [&_video]:object-cover"
         />
@@ -185,32 +186,35 @@ function TwoPersonLayout({
   selfParticipant
 }) {
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-[2rem]">
-
-      {/* Main fullscreen participant */}
-      <div className="absolute inset-0">
+    <div className="grid h-full w-full grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="min-h-0">
         <VideoFrame
           participant={primaryParticipant}
-          label={
-            primaryParticipant?.isLocalParticipant
-              ? 'You'
-              : 'Connected'
-          }
+          label={primaryParticipant ? 'Connected' : 'Waiting'}
           size="hero"
+          mirror={false}
         />
       </div>
 
-      {/* Floating self preview */}
-      {selfParticipant ? (
-        <div className="absolute bottom-6 right-6 z-20 w-[240px] max-w-[28vw] min-w-[160px]">
+      <div className="min-h-0">
+        {selfParticipant ? (
           <VideoFrame
             participant={selfParticipant}
             label="You"
-            size="preview"
+            size="hero"
             overlay
+            mirror
           />
-        </div>
-      ) : null}
+        ) : (
+          <VideoFrame
+            participant={null}
+            label="You"
+            size="hero"
+            overlay
+            mirror
+          />
+        )}
+      </div>
     </div>
   );
 }
@@ -247,89 +251,34 @@ function VideoStage({
   joining
 }) {
   const callStateHooks = useCallStateHooks();
-  const useParticipants = callStateHooks?.useParticipants;
+  const useLocalParticipant = callStateHooks?.useLocalParticipant;
+  const useRemoteParticipants = callStateHooks?.useRemoteParticipants;
   const useCallCallingState = callStateHooks?.useCallCallingState;
 
   /* SAFE PARTICIPANTS */
-  const participants = useParticipants ? useParticipants() : [];
+  const localParticipant = useLocalParticipant ? useLocalParticipant() : null;
+  const remoteParticipants = useRemoteParticipants ? useRemoteParticipants() : [];
+  const participants = [
+    ...(localParticipant ? [localParticipant] : []),
+    ...remoteParticipants
+  ];
 
   const callingState = useCallCallingState ? useCallCallingState() : null;
-
-  const dominantSpeaker =
-    participants.find((p) => p.isDominantSpeaker) || null;
 
   useViewportWidth();
 
   const {
-    orderedParticipants,
     primaryParticipant,
     selfParticipant
   } = useMemo(() => {
-    const nextParticipants = [...participants].sort(
-      (left, right) => {
-        if (
-          left.isLocalParticipant &&
-          !right.isLocalParticipant
-        ) {
-          return 1;
-        }
-
-        if (
-          !left.isLocalParticipant &&
-          right.isLocalParticipant
-        ) {
-          return -1;
-        }
-
-        if (
-          left.sessionId === dominantSpeaker?.sessionId &&
-          right.sessionId !== dominantSpeaker?.sessionId
-        ) {
-          return -1;
-        }
-
-        if (
-          left.sessionId !== dominantSpeaker?.sessionId &&
-          right.sessionId === dominantSpeaker?.sessionId
-        ) {
-          return 1;
-        }
-
-        return 0;
-      }
-    );
-
-    const localParticipant =
-      nextParticipants.find(
-        (participant) => participant.isLocalParticipant
-      ) || null;
-
-    const remoteParticipants =
-      nextParticipants.filter(
-        (participant) => !participant.isLocalParticipant
-      );
-
-    const mainParticipant =
-      remoteParticipants.find(
-        (participant) =>
-          participant.sessionId ===
-          dominantSpeaker?.sessionId
-      ) ||
-      remoteParticipants[0] ||
-      localParticipant ||
-      null;
+    const nextLocalParticipant = localParticipant || null;
+    const nextRemoteParticipant = remoteParticipants[0] || null;
 
     return {
-      orderedParticipants: nextParticipants,
-      primaryParticipant: mainParticipant,
-      selfParticipant:
-        localParticipant &&
-        mainParticipant?.sessionId !==
-          localParticipant.sessionId
-          ? localParticipant
-          : null
+      primaryParticipant: nextRemoteParticipant || nextLocalParticipant,
+      selfParticipant: nextLocalParticipant
     };
-  }, [participants, dominantSpeaker]);
+  }, [localParticipant, remoteParticipants]);
 
   return (
     <div className="flex h-full min-h-0 w-full flex-col gap-3">
@@ -340,7 +289,7 @@ function VideoStage({
 
       <div className="relative min-h-0 flex-1">
         <StageContent
-          participants={orderedParticipants}
+          participants={participants}
           primaryParticipant={primaryParticipant}
           selfParticipant={selfParticipant}
           status={callingState || status}
