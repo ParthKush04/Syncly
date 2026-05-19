@@ -23,6 +23,11 @@ export async function createApp() {
       .filter(Boolean)
   );
 
+  // Allow localhost during development for the frontend dev server.
+  if (process.env.NODE_ENV !== 'production') {
+    allowedOrigins.add('http://localhost:5174');
+  }
+
   // Strengthen security headers to prevent Chrome Safe Browsing blocks
   app.use(helmet({
     contentSecurityPolicy: {

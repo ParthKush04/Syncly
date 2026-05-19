@@ -20,10 +20,11 @@ function ToggleButton({ active, label, onClick }) {
 export default function CallControlsPanel({ onSkip, onLeaveToDashboard, onLeave, isExitingCall = false }) {
   const call = useCall();
   const callStateHooks = useCallStateHooks();
+  const call = useCall();
   const useCameraState = callStateHooks?.useCameraState;
   const useMicrophoneState = callStateHooks?.useMicrophoneState;
-  const cameraState = useCameraState ? useCameraState() : { camera: { toggle: () => {} }, isMute: true };
-  const microphoneState = useMicrophoneState ? useMicrophoneState() : { microphone: { toggle: () => {} }, isMute: true };
+  const cameraState = call && useCameraState ? useCameraState() : { camera: { toggle: () => {} }, isMute: true };
+  const microphoneState = call && useMicrophoneState ? useMicrophoneState() : { microphone: { toggle: () => {} }, isMute: true };
   const { camera, isMute: isCameraMuted } = cameraState;
   const { microphone, isMute: isMicrophoneMuted } = microphoneState;
   const leavingRef = useRef(false);

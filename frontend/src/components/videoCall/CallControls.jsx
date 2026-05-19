@@ -1,4 +1,4 @@
-import { useCallStateHooks } from '@stream-io/video-react-sdk';
+import { useCallStateHooks, useCall } from '@stream-io/video-react-sdk';
 
 function IconButton({ label, active, onClick, disabled, children }) {
   return (
@@ -73,10 +73,11 @@ function LeaveIcon() {
 
 export default function CallControls({ onSkip, onLeave, isBusy = false }) {
   const callStateHooks = useCallStateHooks();
+  const call = useCall();
   const useCameraState = callStateHooks?.useCameraState;
   const useMicrophoneState = callStateHooks?.useMicrophoneState;
-  const cameraState = useCameraState ? useCameraState() : { camera: { toggle: () => {} }, isMute: true };
-  const microphoneState = useMicrophoneState ? useMicrophoneState() : { microphone: { toggle: () => {} }, isMute: true };
+  const cameraState = call && useCameraState ? useCameraState() : { camera: { toggle: () => {} }, isMute: true };
+  const microphoneState = call && useMicrophoneState ? useMicrophoneState() : { microphone: { toggle: () => {} }, isMute: true };
   const { camera, isMute: isCameraMuted } = cameraState;
   const { microphone, isMute: isMicrophoneMuted } = microphoneState;
 
