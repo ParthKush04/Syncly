@@ -49,6 +49,36 @@ async function getLinkedInConfig() {
   return configPromise;
 }
 
+function extractLinkedInPictureUrl(picture) {
+  if (!picture) {
+    return '';
+  }
+
+  if (typeof picture === 'string') {
+    return picture.trim();
+  }
+
+  if (typeof picture !== 'object') {
+    return '';
+  }
+
+  const directUrl = picture.value || picture.url || picture.picture || picture.imageUrl;
+
+  if (typeof directUrl === 'string' && directUrl.trim()) {
+    return directUrl.trim();
+  }
+
+  const decoratedImage = picture['displayImage~'] || picture.displayImageDecorated || picture.displayImage;
+
+  const decoratedUrl = decoratedImage?.elements?.[0]?.identifiers?.[0]?.identifier;
+
+  if (typeof decoratedUrl === 'string' && decoratedUrl.trim()) {
+    return decoratedUrl.trim();
+  }
+
+  return '';
+}
+
 export async function buildLinkedInLoginUrl(req) {
   const config = await getLinkedInConfig();
   const state = oidc.randomState();
@@ -74,6 +104,8 @@ function normalizeLinkedInProfile(claims, userInfo) {
     ...userInfo
   };
 
+  const pictureUrl = extractLinkedInPictureUrl(profile.picture);
+
   const fullName = profile.name || [profile.given_name, profile.family_name].filter(Boolean).join(' ') || 'LinkedIn User';
 
   return {
@@ -85,9 +117,28 @@ function normalizeLinkedInProfile(claims, userInfo) {
       familyName: profile.family_name || ''
     },
     emails: profile.email ? [{ value: profile.email }] : [],
-    photos: profile.picture ? [{ value: profile.picture }] : [],
+    photos: pictureUrl ? [{ value: pictureUrl }] : [],
     _json: profile
   };
+}
+
+async function fetchLinkedInDecoratedProfile(accessToken) {
+  try {
+    const response = await fetch('https://api.linkedin.com/v2/me?projection=(id,firstName,lastName,profilePicture(displayImage~:playableStreams))', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      return {};
+    }
+
+    return await response.json();
+  } catch {
+    return {};
+  }
 }
 
 async function resolveLinkedInPicture(profile) {
@@ -171,12 +222,24 @@ export async function exchangeLinkedInCallback(req) {
   const userInfo = tokenPayload.access_token
     ? await oidc.fetchUserInfo(config, tokenPayload.access_token, subject)
     : {};
+  const decoratedProfile = tokenPayload.access_token
+    ? await fetchLinkedInDecoratedProfile(tokenPayload.access_token)
+    : {};
+
+  const decoratedPictureUrl = decoratedProfile?.profilePicture
+    ? extractLinkedInPictureUrl(decoratedProfile.profilePicture)
+    : '';
 
   return {
     tokens: tokenPayload,
     profile: await (async () => {
       const profile = normalizeLinkedInProfile(claims, userInfo);
-      profile.photos = profile.photos.length ? [{ value: await resolveLinkedInPicture({ picture: profile.photos[0].value }) }] : [];
+      const pictureCandidate = profile.photos[0]?.value || decoratedPictureUrl;
+
+      profile.photos = pictureCandidate
+        ? [{ value: await resolveLinkedInPicture({ picture: pictureCandidate }) }]
+        : [];
+
       return profile;
     })()
   };
