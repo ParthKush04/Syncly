@@ -43,6 +43,7 @@ router.get('/google/failure', googleAuthFailure);
 
 router.get('/linkedin', linkedinLogin);
 router.get('/linkedin/callback', linkedinCallback);
+router.get('/linkedin/callback/', linkedinCallback);
 router.get('/me', protect, getCurrentUser);
 router.post('/logout', logoutUser);
 router.get('/logout', logoutUser);

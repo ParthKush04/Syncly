@@ -178,10 +178,6 @@ a {
     background: linear-gradient(180deg, #020617 0%, #071024 100%);
   }
 
-  .rounded-[2rem], .rounded-[1.5rem], .rounded-[1.75rem], .rounded-3xl {
-    border-radius: 0.75rem;
-  }
-
   .animate-drift-slow, .animate-float-soft, .animate-sheen {
     animation: none;
   }

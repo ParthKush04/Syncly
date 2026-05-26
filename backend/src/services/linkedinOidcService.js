@@ -19,6 +19,19 @@ const linkedInScopes = (process.env.LINKEDIN_SCOPE || 'openid profile email')
   .map((scope) => scope.trim())
   .filter(Boolean);
 
+function getLinkedInCallbackUrl(req) {
+  if (process.env.LINKEDIN_CALLBACK_URL) {
+    return process.env.LINKEDIN_CALLBACK_URL;
+  }
+
+  const forwardedProto = String(req?.headers?.['x-forwarded-proto'] || '').split(',')[0].trim();
+  const forwardedHost = String(req?.headers?.['x-forwarded-host'] || '').split(',')[0].trim();
+  const protocol = forwardedProto || req?.protocol || 'https';
+  const host = forwardedHost || req?.get?.('host') || '';
+
+  return `${protocol}://${host}/api/auth/linkedin/callback`;
+}
+
 let configPromise;
 
 async function getLinkedInConfig() {
@@ -39,6 +52,7 @@ async function getLinkedInConfig() {
 export async function buildLinkedInLoginUrl(req) {
   const config = await getLinkedInConfig();
   const state = oidc.randomState();
+  const redirectUri = getLinkedInCallbackUrl(req);
 
   req.session.linkedinOidc = {
     state
@@ -46,7 +60,7 @@ export async function buildLinkedInLoginUrl(req) {
 
   const parameters = new URLSearchParams({
     response_type: 'code',
-    redirect_uri: process.env.LINKEDIN_CALLBACK_URL || 'https://syncly-3nm4.onrender.com/api/auth/linkedin/callback',
+    redirect_uri: redirectUri,
     scope: linkedInScopes.join(' '),
     state
   });
@@ -104,6 +118,7 @@ async function resolveLinkedInPicture(profile) {
 
 export async function exchangeLinkedInCallback(req) {
   const config = await getLinkedInConfig();
+  const redirectUri = getLinkedInCallbackUrl(req);
   const currentUrl = new URL(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
   const code = currentUrl.searchParams.get('code');
   const responseState = currentUrl.searchParams.get('state');
@@ -120,7 +135,7 @@ export async function exchangeLinkedInCallback(req) {
   const tokenBody = new URLSearchParams({
     grant_type: 'authorization_code',
     code,
-    redirect_uri: process.env.LINKEDIN_CALLBACK_URL || 'https://syncly-3nm4.onrender.com/api/auth/linkedin/callback',
+    redirect_uri: redirectUri,
     client_id: process.env.LINKEDIN_CLIENT_ID,
     client_secret: process.env.LINKEDIN_CLIENT_SECRET
   });
