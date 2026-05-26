@@ -80,9 +80,8 @@ export default function CallControls({ onSkip, onLeave, isBusy = false }) {
   const microphoneState = call && useMicrophoneState ? useMicrophoneState() : { microphone: { toggle: () => {} }, isMute: true };
   const { camera, isMute: isCameraMuted } = cameraState;
   const { microphone, isMute: isMicrophoneMuted } = microphoneState;
-
   return (
-    <div className="flex w-full flex-nowrap items-center justify-start gap-2 overflow-x-auto whitespace-nowrap sm:justify-center sm:gap-3">
+    <div className="flex w-full items-center justify-center gap-2">
       <IconButton label={isMicrophoneMuted ? 'Unmute' : 'Mute'} active={!isMicrophoneMuted} onClick={() => microphone.toggle()} disabled={isBusy}>
         <MicIcon muted={isMicrophoneMuted} />
       </IconButton>
@@ -93,22 +92,12 @@ export default function CallControls({ onSkip, onLeave, isBusy = false }) {
 
       <button
         type="button"
-        onClick={onSkip}
-        disabled={isBusy}
-        className="inline-flex items-center justify-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        <SkipIcon />
-        <span>Skip</span>
-      </button>
-
-      <button
-        type="button"
         onClick={onLeave}
         disabled={isBusy}
-        className="inline-flex items-center justify-center gap-2 rounded-full bg-rose-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-rose-400 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex items-center justify-center gap-2 rounded-full bg-rose-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-400 disabled:cursor-not-allowed disabled:opacity-60"
       >
         <LeaveIcon />
-        <span>{isBusy ? 'Processing...' : 'Leave call'}</span>
+        <span className="hidden sm:inline">{isBusy ? 'Processing...' : 'Leave'}</span>
       </button>
     </div>
   );

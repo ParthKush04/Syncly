@@ -163,20 +163,13 @@ function VideoStageHeader({
   participantCount
 }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-[1.5rem] border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 shadow-sm backdrop-blur-xl">
+    <div className="flex items-center justify-between gap-3 rounded-md px-3 py-2 text-sm text-white/80">
       <div className="flex items-center gap-3">
-        <span className="rounded-full border border-cyan-300/20 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-cyan-100">
-          Video room
-        </span>
-
-        <span className="text-white/60">
-          {participantCount} participant(s)
-        </span>
+        <strong className="text-sm text-white">Video room</strong>
+        <span className="text-xs text-white/60">{participantCount} participants</span>
       </div>
 
-      <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white/90">
-        {status}
-      </span>
+      <div className="text-xs text-white/60">{status}</div>
     </div>
   );
 }
@@ -356,7 +349,7 @@ export default function VideoRoom({
   }
 
   return (
-    <section className="relative flex h-full w-full min-h-0 flex-1 items-stretch overflow-hidden rounded-[2.5rem] p-3 shadow-[0_35px_100px_rgba(0,0,0,0.45)] sm:p-4 lg:p-5">
+    <section className="relative flex h-full w-full min-h-0 flex-1 items-stretch overflow-hidden rounded-lg p-2 sm:p-3">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(34,211,236,0.16),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.18),transparent_34%),linear-gradient(180deg,rgba(2,6,23,0.96)_0%,rgba(15,23,42,0.96)_100%)]" />
 
       <StreamVideo client={client}>

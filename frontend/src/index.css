@@ -172,3 +172,17 @@ a {
   background: rgba(34, 211, 238, 0.22);
   color: #0f172a;
 }
+
+@media (max-width: 640px) {
+  body {
+    background: linear-gradient(180deg, #020617 0%, #071024 100%);
+  }
+
+  .rounded-[2rem], .rounded-[1.5rem], .rounded-[1.75rem], .rounded-3xl {
+    border-radius: 0.75rem;
+  }
+
+  .animate-drift-slow, .animate-float-soft, .animate-sheen {
+    animation: none;
+  }
+}
