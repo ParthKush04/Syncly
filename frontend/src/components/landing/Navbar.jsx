@@ -1,11 +1,5 @@
+import { Link } from 'react-router-dom';
 import Logo from '../branding/Logo.jsx';
-
-const navItems = [
-  { label: 'Benefits', href: '#benefits' },
-  { label: 'How it works', href: '#how-it-works' },
-  { label: 'Trust', href: '#trust' },
-  { label: 'Contact', href: '#footer' }
-];
 
 export default function Navbar() {
   return (
@@ -15,14 +9,12 @@ export default function Navbar() {
           <Logo tone="light" />
         </a>
 
-        <div className="flex items-center gap-3">
-          <a
-            href="#cta"
-            className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-100"
-          >
-            Get early access
-          </a>
-        </div>
+        <Link
+          to="/login"
+          className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-100"
+        >
+          Get started
+        </Link>
       </div>
     </header>
   );

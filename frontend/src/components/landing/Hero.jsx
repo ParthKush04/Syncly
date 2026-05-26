@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 // Compact hero: single headline, short description, single CTA
 
 export default function Hero() {
@@ -15,16 +17,15 @@ export default function Hero() {
           </p>
 
           <div className="mt-5 animate-fade-up" style={{ animationDelay: '320ms' }}>
-            <a
-              href="#cta"
+            <Link
+              to="/login"
               className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-slate-100"
             >
-              Get early access
-            </a>
+              Get started
+            </Link>
           </div>
         </div>
       </div>
     </section>
   );
 }
- 

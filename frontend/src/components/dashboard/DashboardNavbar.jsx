@@ -4,8 +4,7 @@ import UserAvatar from './UserAvatar.jsx';
 
 const navItems = [
   { label: 'Dashboard', href: '/dashboard' },
-  { label: 'Profile', href: '/profile' },
-  { label: 'Matchmaking', href: '/matchmaking' }
+  { label: 'Profile', href: '/profile' }
 ];
 
 export default function DashboardNavbar({ user, onSignOut }) {

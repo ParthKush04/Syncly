@@ -18,9 +18,9 @@ export default function MatchmakingPanel({ summary }) {
         <button
           type="button"
           onClick={() => navigate('/matchmaking')}
-          className="inline-flex items-center justify-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
+          className="inline-flex min-h-14 items-center justify-center rounded-full bg-white px-6 py-3.5 text-base font-semibold text-slate-900 transition hover:bg-slate-100"
         >
-          Start
+            Start matchmaking
         </button>
       </div>
     </section>

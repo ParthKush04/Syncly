@@ -16,22 +16,19 @@ export default function LoginPage() {
       <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-7xl items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
         <aside className="order-2 lg:order-1">
           <div className="max-w-xl">
-            <span className="inline-flex rounded-full border border-white/12 bg-white/8 px-4 py-2 text-sm font-medium text-white">
+            <span className="inline-flex rounded-full border border-white/12 bg-white/8 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-cyan-100">
               Professional access
             </span>
-            <h2 className="mt-6 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-              Sign in to discover verified professionals.
+            <h2 className="mt-5 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+              Sign in and start meeting the right people.
             </h2>
-            <p className="mt-5 text-lg leading-8 text-white/75">
-              Join high-signal networking rooms, match on shared interests and goals, and start one-on-one calls with
-              people who actually matter to your growth.
+            <p className="mt-4 max-w-lg text-base leading-7 text-white/72">
+              A fast, clean login for verified networking, matches, and one-on-one calls.
             </p>
 
-            <div className="mt-8 grid gap-4 sm:grid-cols-2">
-              <FeatureStat value="LinkedIn" label="verified onboarding" />
-              <FeatureStat value="Real-time" label="call matchmaking" />
-              <FeatureStat value="Premium" label="startup-style design" />
-              <FeatureStat value="Mobile-first" label="responsive experience" />
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              <FeatureStat value="Fast" label="simple access" />
+              <FeatureStat value="Verified" label="trusted profiles" />
             </div>
           </div>
         </aside>
@@ -60,7 +57,7 @@ export default function LoginPage() {
             <SocialAuthButton
               provider="linkedin"
               label="Continue with LinkedIn"
-              description="Verified professional sign-in"
+              description="Best for professional networking"
               icon="in"
               isLoading={loadingProvider === 'linkedin'}
               onClick={() => handleOAuth('linkedin')}
