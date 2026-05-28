@@ -7,22 +7,16 @@ const trustPoints = [
 
 const testimonials = [
   {
-    name: 'Priya N.',
     title: 'Product leader · Fintech',
-    quote: 'The experience feels curated from the first screen. It looks like a place you would trust with your time.',
-    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80'
+    quote: 'The experience feels curated from the first screen. It looks like a place you would trust with your time.'
   },
   {
-    name: 'Jordan M.',
     title: 'Founder · B2B SaaS',
-    quote: 'The design feels premium, calm, and intentional. It makes networking feel less noisy and more human.',
-    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80'
+    quote: 'The design feels premium, calm, and intentional. It makes networking feel less noisy and more human.'
   },
   {
-    name: 'Amina S.',
     title: 'VC associate · Seed stage',
-    quote: 'It feels like a modern startup product that people would actually enjoy coming back to.',
-    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=600&q=80'
+    quote: 'It feels like a modern startup product that people would actually enjoy coming back to.'
   }
 ];
 
@@ -61,18 +55,8 @@ export default function TrustSection() {
             <p className="text-sm uppercase tracking-[0.3em] text-white/70">What users feel</p>
             <div className="grid gap-4 md:grid-cols-3">
               {testimonials.map((testimonial) => (
-                <article key={testimonial.name} className="rounded-[1.25rem] border border-white/12 bg-white/10 p-4 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20 backdrop-blur-md">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={testimonial.image}
-                      alt={testimonial.name}
-                      className="h-12 w-12 rounded-2xl object-cover"
-                    />
-                    <div>
-                      <p className="font-semibold text-white">{testimonial.name}</p>
-                      <p className="text-xs uppercase tracking-[0.2em] text-white/55">{testimonial.title}</p>
-                    </div>
-                  </div>
+                <article key={testimonial.title} className="rounded-[1.25rem] border border-white/12 bg-white/10 p-4 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20 backdrop-blur-md">
+                  <p className="text-xs uppercase tracking-[0.2em] text-cyan-100/70">{testimonial.title}</p>
                   <p className="mt-3 text-sm leading-7 text-white/75">“{testimonial.quote}”</p>
                 </article>
               ))}

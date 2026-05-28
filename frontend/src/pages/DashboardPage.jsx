@@ -1,4 +1,5 @@
 import DashboardNavbar from '../components/dashboard/DashboardNavbar.jsx';
+import TagPanel from '../components/dashboard/TagPanel.jsx';
 import MatchmakingPanel from '../components/dashboard/MatchmakingPanel.jsx';
 import RecentMatches from '../components/dashboard/RecentMatches.jsx';
 import { useEffect, useState } from 'react';
@@ -102,6 +103,8 @@ export default function DashboardPage() {
         <section className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
           <div className="grid gap-6 self-start">
             <MatchmakingPanel summary={summary} />
+
+            <TagPanel title="Interests" items={user?.interests || []} accent="cyan" />
           </div>
 
           <RecentMatches matches={recentMatches} />
