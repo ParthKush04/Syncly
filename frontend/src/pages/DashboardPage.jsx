@@ -16,6 +16,7 @@ export default function DashboardPage() {
   const [connected, setConnected] = useState(false);
   const [cameraReady, setCameraReady] = useState(false);
   const [partnerIndex, setPartnerIndex] = useState(0);
+  const [spinnerVisible, setSpinnerVisible] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -78,7 +79,7 @@ export default function DashboardPage() {
     } finally {
       localStorage.removeItem('synclyToken');
       localStorage.removeItem('synclyUser');
-      navigate('/login', { replace: true });
+      navigate('/', { replace: true });
     }
   };
 
@@ -127,16 +128,19 @@ export default function DashboardPage() {
   const handleStart = async () => {
     setMatching(true);
     setConnected(false);
+    setSpinnerVisible(true);
     const opened = await startCamera();
 
     if (!opened) {
       setMatching(false);
+      setSpinnerVisible(false);
       return;
     }
 
     window.setTimeout(() => {
       setConnected(true);
       setMatching(false);
+      setSpinnerVisible(false);
     }, 1200);
   };
 
@@ -152,18 +156,50 @@ export default function DashboardPage() {
     setPartnerIndex((current) => (current + 1) % partnerQueue.length);
     setConnected(false);
     setMatching(true);
+    setSpinnerVisible(true);
 
     const opened = await startCamera();
 
     if (!opened) {
       setMatching(false);
+      setSpinnerVisible(false);
       return;
     }
 
     window.setTimeout(() => {
       setConnected(true);
       setMatching(false);
+      setSpinnerVisible(false);
     }, 900);
+  };
+
+  const handleAddInterest = () => {
+    const rawValue = window.prompt('Add a new interest');
+    const value = rawValue?.trim();
+
+    if (!value) {
+      return;
+    }
+
+    setUser((currentUser) => {
+      if (!currentUser) {
+        return currentUser;
+      }
+
+      const existingInterests = currentUser.interests || [];
+
+      if (existingInterests.some((item) => item.toLowerCase() === value.toLowerCase())) {
+        return currentUser;
+      }
+
+      const nextUser = {
+        ...currentUser,
+        interests: [...existingInterests, value]
+      };
+
+      localStorage.setItem('synclyUser', JSON.stringify(nextUser));
+      return nextUser;
+    });
   };
 
   const partnerName = partnerQueue[partnerIndex];
@@ -202,6 +238,7 @@ export default function DashboardPage() {
                 title="You"
                 subtitle={matching ? 'Camera on. Looking for a match.' : connected ? 'Live camera is open.' : 'Click start to open your camera.'}
                 active={matching || connected || cameraReady}
+                showSpinner={spinnerVisible && matching}
               >
                 <video
                   ref={localVideoRef}
@@ -216,23 +253,32 @@ export default function DashboardPage() {
                 title={connected ? partnerName : 'Other user'}
                 subtitle={connected ? 'Ready to talk now.' : matching ? 'Waiting for the next user.' : 'Blank until you start matchmaking.'}
                 active={connected || matching}
+                showSpinner={spinnerVisible && matching}
               >
-                <div className="flex h-full w-full flex-col items-center justify-center text-center">
-                  <div className="grid h-16 w-16 place-items-center rounded-full bg-white/6 text-2xl font-semibold text-white">
-                    {connected ? partnerName.slice(0, 1).toUpperCase() : ' '}
+                {connected ? (
+                  <div className="flex h-full w-full flex-col items-center justify-center text-center">
+                    <div className="grid h-16 w-16 place-items-center rounded-full bg-white/6 text-2xl font-semibold text-white">
+                      {partnerName.slice(0, 1).toUpperCase()}
+                    </div>
+                    <p className="mt-4 text-sm font-medium text-white/85">
+                      {partnerName}
+                    </p>
+                    <p className="mt-2 max-w-xs text-sm leading-6 text-white/60">
+                      Remote camera view appears here when connected.
+                    </p>
                   </div>
-                  <p className="mt-4 text-sm font-medium text-white/85">
-                    {connected ? partnerName : 'Waiting for a partner'}
-                  </p>
-                  <p className="mt-2 max-w-xs text-sm leading-6 text-white/60">
-                    {connected ? 'Remote camera view appears here when connected.' : 'This screen stays blank until matchmaking begins.'}
-                  </p>
-                </div>
+                ) : null}
               </CameraScreen>
             </div>
           </div>
 
-          <TagPanel title="Interests" items={user?.interests || []} accent="cyan" />
+          <TagPanel
+            title="Interests"
+            items={user?.interests || []}
+            accent="cyan"
+            actionLabel="Add interest"
+            onAction={handleAddInterest}
+          />
         </section>
       </div>
     </main>
@@ -263,9 +309,9 @@ function ActionButton({ onClick, label }) {
   );
 }
 
-function CameraScreen({ title, subtitle, active, children }) {
+function CameraScreen({ title, subtitle, active, showSpinner = false, children }) {
   return (
-    <div className="flex min-h-[28rem] flex-col overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#0b1119]">
+    <div className="flex min-h-[22rem] flex-col overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#0b1119] md:min-h-[24rem]">
       <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
         <div>
           <p className="text-sm font-semibold text-white">{title}</p>
@@ -277,6 +323,7 @@ function CameraScreen({ title, subtitle, active, children }) {
       </div>
 
       <div className="relative flex min-h-0 flex-1 items-stretch justify-stretch bg-[#05080d]">
+        {showSpinner ? <SpinnerOverlay /> : null}
         {active ? (
           children
         ) : (
@@ -287,6 +334,20 @@ function CameraScreen({ title, subtitle, active, children }) {
             </div>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function SpinnerOverlay() {
+  return (
+    <div className="absolute inset-0 z-10 grid place-items-center bg-[#05080d]/70 backdrop-blur-sm">
+      <div className="flex flex-col items-center gap-4 text-center">
+        <div className="h-14 w-14 animate-spin rounded-full border-4 border-white/15 border-t-cyan-300" />
+        <div>
+          <p className="text-sm font-semibold text-white">Finding your match</p>
+          <p className="mt-1 text-xs uppercase tracking-[0.25em] text-white/55">Connecting camera stream</p>
+        </div>
       </div>
     </div>
   );

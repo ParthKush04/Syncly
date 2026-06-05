@@ -65,8 +65,37 @@ export default function ProfilePage() {
     } finally {
       localStorage.removeItem('synclyToken');
       localStorage.removeItem('synclyUser');
-      navigate('/login', { replace: true });
+      navigate('/', { replace: true });
     }
+  };
+
+  const handleAddInterest = () => {
+    const rawValue = window.prompt('Add a new interest');
+    const value = rawValue?.trim();
+
+    if (!value) {
+      return;
+    }
+
+    setUser((currentUser) => {
+      if (!currentUser) {
+        return currentUser;
+      }
+
+      const existingInterests = currentUser.interests || [];
+
+      if (existingInterests.some((item) => item.toLowerCase() === value.toLowerCase())) {
+        return currentUser;
+      }
+
+      const nextUser = {
+        ...currentUser,
+        interests: [...existingInterests, value]
+      };
+
+      localStorage.setItem('synclyUser', JSON.stringify(nextUser));
+      return nextUser;
+    });
   };
 
   return (
@@ -79,7 +108,13 @@ export default function ProfilePage() {
         {user ? <ProfileCard user={user} /> : null}
 
         <section className="grid gap-6 lg:grid-cols-1">
-          <TagPanel title="Interests" items={user?.interests || []} accent="cyan" />
+          <TagPanel
+            title="Interests"
+            items={user?.interests || []}
+            accent="cyan"
+            actionLabel="Add interest"
+            onAction={handleAddInterest}
+          />
         </section>
       </div>
     </main>
