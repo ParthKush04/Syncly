@@ -16,7 +16,6 @@ export default function DashboardPage() {
   const [connected, setConnected] = useState(false);
   const [cameraReady, setCameraReady] = useState(false);
   const [partnerIndex, setPartnerIndex] = useState(0);
-  const [spinnerVisible, setSpinnerVisible] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -128,19 +127,16 @@ export default function DashboardPage() {
   const handleStart = async () => {
     setMatching(true);
     setConnected(false);
-    setSpinnerVisible(true);
     const opened = await startCamera();
 
     if (!opened) {
       setMatching(false);
-      setSpinnerVisible(false);
       return;
     }
 
     window.setTimeout(() => {
       setConnected(true);
       setMatching(false);
-      setSpinnerVisible(false);
     }, 1200);
   };
 
@@ -156,31 +152,21 @@ export default function DashboardPage() {
     setPartnerIndex((current) => (current + 1) % partnerQueue.length);
     setConnected(false);
     setMatching(true);
-    setSpinnerVisible(true);
 
     const opened = await startCamera();
 
     if (!opened) {
       setMatching(false);
-      setSpinnerVisible(false);
       return;
     }
 
     window.setTimeout(() => {
       setConnected(true);
       setMatching(false);
-      setSpinnerVisible(false);
     }, 900);
   };
 
-  const handleAddInterest = () => {
-    const rawValue = window.prompt('Add a new interest');
-    const value = rawValue?.trim();
-
-    if (!value) {
-      return;
-    }
-
+  const handleAddInterest = (value) => {
     setUser((currentUser) => {
       if (!currentUser) {
         return currentUser;
@@ -238,7 +224,9 @@ export default function DashboardPage() {
                 title="You"
                 subtitle={matching ? 'Camera on. Looking for a match.' : connected ? 'Live camera is open.' : 'Click start to open your camera.'}
                 active={matching || connected || cameraReady}
-                showSpinner={spinnerVisible && matching}
+                showAvatar={matching && !connected}
+                avatarUrl={user?.profileImage || user?.photoUrl || ''}
+                avatarLabel={user?.fullName || 'You'}
               >
                 <video
                   ref={localVideoRef}
@@ -253,13 +241,12 @@ export default function DashboardPage() {
                 title={connected ? partnerName : 'Other user'}
                 subtitle={connected ? 'Ready to talk now.' : matching ? 'Waiting for the next user.' : 'Blank until you start matchmaking.'}
                 active={connected || matching}
-                showSpinner={spinnerVisible && matching}
+                showAvatar={connected}
+                avatarUrl={user?.profileImage || user?.photoUrl || ''}
+                avatarLabel={user?.fullName || 'You'}
               >
                 {connected ? (
                   <div className="flex h-full w-full flex-col items-center justify-center text-center">
-                    <div className="grid h-16 w-16 place-items-center rounded-full bg-white/6 text-2xl font-semibold text-white">
-                      {partnerName.slice(0, 1).toUpperCase()}
-                    </div>
                     <p className="mt-4 text-sm font-medium text-white/85">
                       {partnerName}
                     </p>
@@ -276,8 +263,7 @@ export default function DashboardPage() {
             title="Interests"
             items={user?.interests || []}
             accent="cyan"
-            actionLabel="Add interest"
-            onAction={handleAddInterest}
+            onAddItem={handleAddInterest}
           />
         </section>
       </div>
@@ -309,7 +295,7 @@ function ActionButton({ onClick, label }) {
   );
 }
 
-function CameraScreen({ title, subtitle, active, showSpinner = false, children }) {
+function CameraScreen({ title, subtitle, active, showAvatar = false, avatarUrl = '', avatarLabel = '', children }) {
   return (
     <div className="flex min-h-[22rem] flex-col overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#0b1119] md:min-h-[24rem]">
       <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
@@ -323,9 +309,11 @@ function CameraScreen({ title, subtitle, active, showSpinner = false, children }
       </div>
 
       <div className="relative flex min-h-0 flex-1 items-stretch justify-stretch bg-[#05080d]">
-        {showSpinner ? <SpinnerOverlay /> : null}
         {active ? (
-          children
+          <>
+            {showAvatar ? <AvatarOverlay avatarUrl={avatarUrl} avatarLabel={avatarLabel} /> : null}
+            {children}
+          </>
         ) : (
           <div className="grid w-full place-items-center px-6 text-center text-white/60">
             <div>
@@ -339,16 +327,37 @@ function CameraScreen({ title, subtitle, active, showSpinner = false, children }
   );
 }
 
-function SpinnerOverlay() {
+function AvatarOverlay({ avatarUrl, avatarLabel }) {
   return (
-    <div className="absolute inset-0 z-10 grid place-items-center bg-[#05080d]/70 backdrop-blur-sm">
+    <div className="absolute inset-0 z-10 grid place-items-center bg-[#05080d]/60 backdrop-blur-sm">
       <div className="flex flex-col items-center gap-4 text-center">
-        <div className="h-14 w-14 animate-spin rounded-full border-4 border-white/15 border-t-cyan-300" />
-        <div>
-          <p className="text-sm font-semibold text-white">Finding your match</p>
-          <p className="mt-1 text-xs uppercase tracking-[0.25em] text-white/55">Connecting camera stream</p>
-        </div>
+        {avatarUrl ? (
+          <img
+            src={avatarUrl}
+            alt={avatarLabel}
+            className="h-24 w-24 rounded-full border border-white/15 object-cover shadow-[0_0_0_8px_rgba(255,255,255,0.04)]"
+            referrerPolicy="no-referrer"
+          />
+        ) : (
+          <div className="grid h-24 w-24 place-items-center rounded-full border border-white/15 bg-white/8 text-2xl font-semibold text-white shadow-[0_0_0_8px_rgba(255,255,255,0.04)]">
+            {getInitials(avatarLabel)}
+          </div>
+        )}
+        <p className="text-sm font-semibold text-white">{avatarLabel}</p>
       </div>
     </div>
   );
+}
+
+function getInitials(name) {
+  if (!name) {
+    return 'U';
+  }
+
+  return String(name)
+    .split(' ')
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
 }

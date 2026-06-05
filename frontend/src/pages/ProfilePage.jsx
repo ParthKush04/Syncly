@@ -69,14 +69,7 @@ export default function ProfilePage() {
     }
   };
 
-  const handleAddInterest = () => {
-    const rawValue = window.prompt('Add a new interest');
-    const value = rawValue?.trim();
-
-    if (!value) {
-      return;
-    }
-
+  const handleAddInterest = (value) => {
     setUser((currentUser) => {
       if (!currentUser) {
         return currentUser;
@@ -112,8 +105,7 @@ export default function ProfilePage() {
             title="Interests"
             items={user?.interests || []}
             accent="cyan"
-            actionLabel="Add interest"
-            onAction={handleAddInterest}
+            onAddItem={handleAddInterest}
           />
         </section>
       </div>
