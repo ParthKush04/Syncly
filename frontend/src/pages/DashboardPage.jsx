@@ -1,6 +1,5 @@
 import DashboardNavbar from '../components/dashboard/DashboardNavbar.jsx';
 import TagPanel from '../components/dashboard/TagPanel.jsx';
-import MatchmakingPanel from '../components/dashboard/MatchmakingPanel.jsx';
 import RecentMatches from '../components/dashboard/RecentMatches.jsx';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +11,8 @@ export default function DashboardPage() {
   const [recentMatches, setRecentMatches] = useState([]);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [matching, setMatching] = useState(false);
+  const [connected, setConnected] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -79,25 +80,35 @@ export default function DashboardPage() {
       <div className="pointer-events-none fixed inset-0 -z-10 bg-matte" />
       <div className="mx-auto grid max-w-7xl gap-6">
         <DashboardNavbar user={user || {}} onSignOut={handleSignOut} />
-        <section className="overflow-hidden rounded-[2.5rem] border border-white/12 card-matte shadow-2xl shadow-black/25">
-          <div className="grid gap-6 px-6 py-8 text-white sm:px-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:px-10">
-            <div>
-              <p className="text-xs uppercase tracking-[0.45em] text-cyan-100/85">Dashboard</p>
-              <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-                {loading ? 'Loading your dashboard...' : `Welcome back, ${user?.fullName || 'user'}`}
-              </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-white/72 sm:text-base">
-                A simple overview of your profile strength, reputation, and matching activity.
-              </p>
+        {/* Top matchmaking area: two large matte screens and start button */}
+        <section className="grid gap-6 lg:grid-cols-2">
+          <div className="space-y-6">
+            <div className="rounded-[2rem] border border-white/12 card-matte p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.45em] text-cyan-100/85">Matchmaking</p>
+                  <p className="mt-1 text-sm text-white/75">Start a quick match to connect with another professional.</p>
+                </div>
+                <div>
+                  {/* Start matchmaking button: shows white text on matte */}
+                  <StartMatchButton onStart={() => {
+                    setMatching(true);
+                    setConnected(false);
+                    setTimeout(() => {
+                      setConnected(true);
+                      setMatching(false);
+                    }, 1400);
+                  }} matching={matching} connected={connected} />
+                </div>
+              </div>
+
+              <TwoScreenPreview user={user} connected={connected} matching={matching} />
             </div>
 
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:justify-self-end">
-              <StatPill label="Profile strength" value={`${summary?.profileStrength ?? 0}%`} dark />
-              <StatPill label="Reputation" value={`${user?.reputationScore ?? 0}/100`} dark />
-              <StatPill label="Matches" value={`${summary?.activeMatches ?? 0}`} dark />
-              <StatPill label="Score" value={`${summary?.networkScore ?? user?.reputationScore ?? 0}/100`} dark />
-            </div>
+            <TagPanel title="Interests" items={user?.interests || []} accent="cyan" />
           </div>
+
+          <RecentMatches matches={recentMatches} />
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
@@ -119,6 +130,45 @@ function StatPill({ label, value, dark = false }) {
     <div className={`rounded-2xl border px-4 py-3 text-left shadow-sm ${dark ? 'border-white/10 bg-white/10 backdrop-blur-md' : 'border-white/10 bg-white/8'}`}>
       <p className={`text-xs uppercase tracking-[0.25em] ${dark ? 'text-cyan-100/80' : 'text-white/65'}`}>{label}</p>
       <p className={`mt-2 text-lg font-semibold text-white`}>{value}</p>
+    </div>
+  );
+}
+
+function StartMatchButton({ onStart, matching, connected }) {
+  return (
+    <button
+      type="button"
+      onClick={onStart}
+      disabled={matching || connected}
+      className={`inline-flex min-h-14 items-center justify-center rounded-full px-6 py-3.5 text-base font-semibold transition ${connected ? 'bg-emerald-600 text-white' : 'bg-white/5 text-white'} ${matching ? 'opacity-80 cursor-wait' : ''}`}
+    >
+      {matching ? 'Matching...' : connected ? 'Connected' : 'Start matchmaking'}
+    </button>
+  );
+}
+
+function TwoScreenPreview({ user, connected, matching }) {
+  const otherName = 'Other User';
+
+  return (
+    <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+      {[0, 1].map((i) => (
+        <div
+          key={i}
+          className="rounded-[1.5rem] border border-white/10 bg-white/5 h-56 md:h-80 flex flex-col items-center justify-center text-white"
+        >
+          {connected ? (
+            <div className="text-center">
+              <div className="h-14 w-14 rounded-full bg-white/5 text-white grid place-items-center text-xl font-semibold mb-3">
+                {i === 0 ? (user?.fullName?.split(' ').map(n => n[0]).slice(0,2).join('') || 'U') : 'O'}
+              </div>
+              <div className="text-sm font-semibold">{i === 0 ? (user?.fullName || 'You') : otherName}</div>
+            </div>
+          ) : (
+            <div className="text-center text-white/60">{matching ? 'Connecting…' : 'Waiting for match'}</div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
