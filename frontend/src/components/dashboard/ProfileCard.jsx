@@ -7,14 +7,13 @@ export default function ProfileCard({ user, summary }) {
   const profileStrength = summary?.profileStrength ?? 0;
 
   return (
-    <section className="overflow-hidden rounded-[2.25rem] border border-white/12 bg-white/8 shadow-2xl shadow-black/25 backdrop-blur-2xl">
-      <div className="bg-[linear-gradient(135deg,rgba(8,15,35,0.96),rgba(14,165,233,0.18),rgba(255,255,255,0.02))] px-6 py-6 text-white sm:px-7">
+    <section className="overflow-hidden rounded-[2.25rem] border border-white/12 card-matte shadow-2xl shadow-black/25">
+      <div className="px-6 py-6 text-white sm:px-7">
         <div className="flex flex-col gap-5 md:flex-row md:items-center">
           <UserAvatar
             fullName={user.fullName}
             photoUrl={user.photoUrl}
             sizeClassName="h-20 w-20"
-            fallbackGradient="from-cyan-300 to-blue-500"
             imageClassName="shadow-[0_16px_40px_rgba(15,23,42,0.35)]"
           />
           <div className="min-w-0 flex-1">

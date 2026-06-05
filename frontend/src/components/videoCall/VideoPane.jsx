@@ -5,11 +5,9 @@ export default function VideoPane({ title, subtitle, accent = 'cyan', isLocal = 
       : 'from-cyan-100 via-cyan-50 to-transparent border-cyan-200';
 
   return (
-    <section className="relative min-h-[280px] overflow-hidden rounded-[2rem] border border-white/12 bg-[linear-gradient(135deg,rgba(255,255,255,0.08),rgba(255,255,255,0.04))] p-4 shadow-2xl shadow-black/25 sm:min-h-[360px]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),transparent_35%)]" />
-      <div className="absolute inset-0 opacity-80 bg-[radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.12),transparent_40%)]" />
+    <section className="relative min-h-[280px] overflow-hidden rounded-[2rem] border border-white/12 card-matte p-4 shadow-2xl shadow-black/25 sm:min-h-[360px]">
 
-      <div className="relative flex h-full min-h-[250px] flex-col justify-between rounded-[1.6rem] border border-white/12 bg-white/8 p-4 sm:min-h-[320px] sm:p-5 backdrop-blur-xl">
+      <div className="relative flex h-full min-h-[250px] flex-col justify-between rounded-[1.6rem] border border-white/12 bg-white/6 p-4 sm:min-h-[320px] sm:p-5">
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-white/60">{isLocal ? 'You' : 'Remote participant'}</p>
@@ -23,12 +21,12 @@ export default function VideoPane({ title, subtitle, accent = 'cyan', isLocal = 
         </div>
 
         <div className="relative mt-6 flex flex-1 items-center justify-center">
-          <div className="absolute h-44 w-44 rounded-full bg-cyan-400/18 blur-3xl animate-float-soft" />
-          <div className="absolute h-28 w-28 rounded-full bg-blue-500/18 blur-2xl animate-drift-slow" />
+          <div className="absolute h-44 w-44 rounded-full bg-white/2 blur-3xl animate-float-soft" />
+          <div className="absolute h-28 w-28 rounded-full bg-white/2 blur-2xl animate-drift-slow" />
 
           <div className="relative grid place-items-center">
-            <div className="flex h-28 w-28 items-center justify-center rounded-[1.75rem] border border-white/12 bg-[linear-gradient(135deg,rgba(255,255,255,0.12),rgba(255,255,255,0.04))] shadow-2xl shadow-black/20 sm:h-36 sm:w-36">
-              <div className="grid h-20 w-20 place-items-center rounded-[1.25rem] bg-[linear-gradient(135deg,#0f172a,#1d4ed8)] text-lg font-semibold text-white shadow-sm sm:h-24 sm:w-24 sm:text-xl">
+            <div className="flex h-28 w-28 items-center justify-center rounded-[1.75rem] border border-white/12 card-matte shadow-2xl shadow-black/20 sm:h-36 sm:w-36">
+              <div className="grid h-20 w-20 place-items-center rounded-[1.25rem] accent-solid text-lg font-semibold text-white shadow-sm sm:h-24 sm:w-24 sm:text-xl">
                 {isLocal ? 'ME' : 'AV'}
               </div>
             </div>

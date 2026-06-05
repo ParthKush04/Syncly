@@ -13,8 +13,8 @@ export default function CTASection() {
   return (
     <section id="cta" className="px-4 py-16 sm:px-6 lg:px-10 lg:py-24">
       <div className="mx-auto max-w-7xl">
-        <div className="overflow-hidden rounded-[2rem] border border-white/12 bg-[linear-gradient(135deg,rgba(56,189,248,0.2)_0%,rgba(249,115,22,0.18)_28%,rgba(236,72,153,0.16)_58%,rgba(168,85,247,0.18)_100%)] p-8 shadow-2xl shadow-black/20 sm:p-10 animate-fade-up backdrop-blur-xl">
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/70 to-transparent" />
+        <div className="overflow-hidden rounded-[2rem] border border-white/12 card-matte p-8 shadow-2xl shadow-black/20 sm:p-10 animate-fade-up">
+          <div className="absolute inset-x-0 top-0 h-px bg-white/5" />
           <div className="max-w-2xl">
             <p className="text-sm uppercase tracking-[0.35em] text-white/70">Call to action</p>
             <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">

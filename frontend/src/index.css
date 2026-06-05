@@ -16,12 +16,7 @@ body,
 }
 
 body {
-  background:
-    radial-gradient(circle at top left, rgba(56, 189, 248, 0.2), transparent 24%),
-    radial-gradient(circle at top right, rgba(236, 72, 153, 0.16), transparent 22%),
-    radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.14), transparent 24%),
-    radial-gradient(circle at bottom right, rgba(168, 85, 247, 0.18), transparent 24%),
-    linear-gradient(135deg, #020617 0%, #0b1227 28%, #1d2b5c 54%, #312e81 78%, #020617 100%);
+  background: #070b10;
   color: #ffffff;
 }
 
@@ -112,19 +107,33 @@ a {
   }
 }
 
-/* Dark glass card used site-wide to replace light white panels */
-.card-dark {
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border: 1px solid rgba(255,255,255,0.06);
-  color: #ffffff;
-  backdrop-filter: blur(10px);
+/* Dark matte card styles for a modern, no-gradient theme */
+.bg-matte {
+  background: #070b10;
 }
 
-.card-dark-strong {
-  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
-  border: 1px solid rgba(255,255,255,0.08);
+.card-matte {
+  background: #0f1720; /* slightly lighter than page bg */
+  border: 1px solid rgba(255,255,255,0.04);
+  color: #e6eef8;
+  backdrop-filter: blur(6px);
+}
+
+.card-matte-strong {
+  background: #0b1220;
+  border: 1px solid rgba(255,255,255,0.06);
   color: #ffffff;
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(8px);
+}
+
+.accent-solid {
+  background: #1f6feb; /* subtle blue accent */
+  color: white;
+}
+
+.avatar-fallback {
+  background: linear-gradient(180deg, #0b1220, #0f1724);
+  color: #e6eef8;
 }
 
 .animate-spin-slow {

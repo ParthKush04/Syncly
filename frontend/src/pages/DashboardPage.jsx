@@ -76,11 +76,11 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen px-4 py-6 text-white sm:px-6 lg:px-10 lg:py-8">
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.18),transparent_24%),radial-gradient(circle_at_top_right,rgba(249,115,22,0.14),transparent_22%),radial-gradient(circle_at_bottom_left,rgba(236,72,153,0.12),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.14),transparent_24%),linear-gradient(135deg,#020617_0%,#0b1227_28%,#2a1d5d_54%,#8b2e11_78%,#020617_100%)]" />
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-matte" />
       <div className="mx-auto grid max-w-7xl gap-6">
         <DashboardNavbar user={user || {}} onSignOut={handleSignOut} />
-        <section className="overflow-hidden rounded-[2.5rem] border border-white/12 bg-white/8 shadow-2xl shadow-black/25 backdrop-blur-2xl">
-          <div className="grid gap-6 bg-[linear-gradient(135deg,rgba(8,15,35,0.98),rgba(15,23,42,0.92)_55%,rgba(14,165,233,0.75))] px-6 py-8 text-white sm:px-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:px-10">
+        <section className="overflow-hidden rounded-[2.5rem] border border-white/12 card-matte shadow-2xl shadow-black/25">
+          <div className="grid gap-6 px-6 py-8 text-white sm:px-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:px-10">
             <div>
               <p className="text-xs uppercase tracking-[0.45em] text-cyan-100/85">Dashboard</p>
               <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">

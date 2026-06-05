@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 export default function Hero() {
   return (
     <section id="top" className="relative overflow-hidden px-4 pt-16 sm:px-6 lg:px-10 lg:pt-24">
-      <div className="absolute inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.12),transparent_30%),radial-gradient(circle_at_top_right,rgba(168,85,247,0.08),transparent_28%)]" />
+      <div className="absolute inset-x-0 top-0 -z-10 h-80 bg-matte" />
       <div className="mx-auto grid max-w-7xl gap-14 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
         <div className="relative z-10 animate-fade-up" style={{ animationDelay: '80ms' }}>
           <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl animate-fade-up" style={{ animationDelay: '160ms' }}>

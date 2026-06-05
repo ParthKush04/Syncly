@@ -13,7 +13,7 @@ function getInitials(fullName) {
     .toUpperCase();
 }
 
-export default function UserAvatar({ fullName, photoUrl, sizeClassName = 'h-14 w-14', fallbackClassName = '', imageClassName = '', fallbackGradient = 'from-cyan-400 to-blue-500' }) {
+export default function UserAvatar({ fullName, photoUrl, sizeClassName = 'h-14 w-14', fallbackClassName = '', imageClassName = '' }) {
   const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function UserAvatar({ fullName, photoUrl, sizeClassName = 'h-14 w
   if (!shouldShowImage) {
     return (
       <div
-        className={`${sizeClassName} grid shrink-0 place-items-center rounded-2xl bg-gradient-to-br ${fallbackGradient} text-sm font-semibold text-white shadow-lg ${fallbackClassName}`}
+        className={`${sizeClassName} grid shrink-0 place-items-center rounded-2xl avatar-fallback text-sm font-semibold shadow-lg ${fallbackClassName}`}
         aria-label={fullName || 'User avatar'}
       >
         {initials}

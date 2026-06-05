@@ -50,7 +50,7 @@ function getInitials(name) {
 
 function WaitingPanel({ onJoin, joining, status }) {
   return (
-    <div className="grid h-full w-full min-h-0 place-items-center rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.015))] p-6 text-center text-white shadow-2xl shadow-black/30 backdrop-blur-xl">
+    <div className="grid h-full w-full min-h-0 place-items-center rounded-[2rem] border border-white/10 card-matte p-6 text-center text-white shadow-2xl shadow-black/30">
       <div className="max-w-lg">
         <p className="text-xs uppercase tracking-[0.45em] text-cyan-300">
           Call ready
@@ -115,7 +115,7 @@ function VideoFrame({
           className="absolute inset-0 h-full w-full [&_video]:h-full [&_video]:w-full [&_video]:object-cover"
         />
       ) : (
-        <div className="absolute inset-0 grid place-items-center bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.16),transparent_35%),linear-gradient(180deg,rgba(2,6,23,0.9),rgba(15,23,42,0.9))]">
+        <div className="absolute inset-0 grid place-items-center bg-matte">
           <div className="grid place-items-center gap-3 text-center">
             <div className="grid h-20 w-20 place-items-center rounded-[1.5rem] border border-white/10 bg-white/5 text-xl font-semibold text-white/80">
               {initials || '??'}
@@ -129,7 +129,7 @@ function VideoFrame({
       )}
 
       {/* Overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,6,23,0.02)_0%,rgba(2,6,23,0.08)_40%,rgba(2,6,23,0.92)_100%)]" />
+      <div className="absolute inset-0 bg-matte" />
 
       {/* Top label */}
       <div className="absolute left-4 top-4 rounded-full border border-white/10 bg-black/40 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-white/85 backdrop-blur-sm">
@@ -350,7 +350,7 @@ export default function VideoRoom({
 
   return (
     <section className="relative flex h-full w-full min-h-0 flex-1 items-stretch overflow-hidden rounded-lg p-2 sm:p-3">
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(34,211,236,0.16),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.18),transparent_34%),linear-gradient(180deg,rgba(2,6,23,0.96)_0%,rgba(15,23,42,0.96)_100%)]" />
+      <div className="absolute inset-0 -z-10 bg-matte" />
 
       <StreamVideo client={client}>
         <ErrorBoundary>
