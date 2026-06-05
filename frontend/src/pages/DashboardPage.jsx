@@ -1,18 +1,21 @@
 import DashboardNavbar from '../components/dashboard/DashboardNavbar.jsx';
 import TagPanel from '../components/dashboard/TagPanel.jsx';
-import RecentMatches from '../components/dashboard/RecentMatches.jsx';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getDashboardData } from '../services/dashboardService.js';
 
+const partnerQueue = ['Aarav', 'Maya', 'Riya', 'Arjun'];
+
 export default function DashboardPage() {
   const navigate = useNavigate();
+  const localVideoRef = useRef(null);
+  const streamRef = useRef(null);
   const [user, setUser] = useState(null);
-  const [recentMatches, setRecentMatches] = useState([]);
-  const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [matching, setMatching] = useState(false);
   const [connected, setConnected] = useState(false);
+  const [cameraReady, setCameraReady] = useState(false);
+  const [partnerIndex, setPartnerIndex] = useState(0);
 
   useEffect(() => {
     let mounted = true;
@@ -28,8 +31,6 @@ export default function DashboardPage() {
           };
 
           setUser(normalizedUser);
-          setSummary(data.summary || null);
-          setRecentMatches(data.recentMatches || []);
           localStorage.setItem('synclyUser', JSON.stringify(normalizedUser));
         }
       } catch {
@@ -62,6 +63,12 @@ export default function DashboardPage() {
     };
   }, []);
 
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, []);
+
   const handleSignOut = async () => {
     try {
       await fetch(`${import.meta.env.VITE_API_URL || 'https://syncly-3nm4.onrender.com'}/api/auth/logout`, {
@@ -75,90 +82,212 @@ export default function DashboardPage() {
     }
   };
 
+  const startCamera = async () => {
+    if (streamRef.current) {
+      return true;
+    }
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+      return false;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: false
+      });
+
+      streamRef.current = stream;
+
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = stream;
+      }
+
+      setCameraReady(true);
+      return true;
+    } catch {
+      setCameraReady(false);
+      return false;
+    }
+  };
+
+  const stopCamera = () => {
+    const stream = streamRef.current;
+
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+
+    if (localVideoRef.current) {
+      localVideoRef.current.srcObject = null;
+    }
+  };
+
+  const handleStart = async () => {
+    setMatching(true);
+    setConnected(false);
+    const opened = await startCamera();
+
+    if (!opened) {
+      setMatching(false);
+      return;
+    }
+
+    window.setTimeout(() => {
+      setConnected(true);
+      setMatching(false);
+    }, 1200);
+  };
+
+  const handleCancel = () => {
+    stopCamera();
+    setMatching(false);
+    setConnected(false);
+    setCameraReady(false);
+    setPartnerIndex(0);
+  };
+
+  const handleSkip = async () => {
+    setPartnerIndex((current) => (current + 1) % partnerQueue.length);
+    setConnected(false);
+    setMatching(true);
+
+    const opened = await startCamera();
+
+    if (!opened) {
+      setMatching(false);
+      return;
+    }
+
+    window.setTimeout(() => {
+      setConnected(true);
+      setMatching(false);
+    }, 900);
+  };
+
+  const partnerName = partnerQueue[partnerIndex];
+
   return (
     <main className="min-h-screen px-4 py-6 text-white sm:px-6 lg:px-10 lg:py-8">
       <div className="pointer-events-none fixed inset-0 -z-10 bg-matte" />
       <div className="mx-auto grid max-w-7xl gap-6">
         <DashboardNavbar user={user || {}} onSignOut={handleSignOut} />
-        {/* Top matchmaking area: two large matte screens and start button */}
-        <section className="grid gap-6 lg:grid-cols-2">
-          <div className="space-y-6">
-            <div className="rounded-[2rem] border border-white/12 card-matte p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.45em] text-cyan-100/85">Matchmaking</p>
-                  <p className="mt-1 text-sm text-white/75">Start a quick match to connect with another professional.</p>
-                </div>
-                <div>
-                  {/* Start matchmaking button: shows white text on matte */}
-                  <StartMatchButton onStart={() => {
-                    setMatching(true);
-                    setConnected(false);
-                    setTimeout(() => {
-                      setConnected(true);
-                      setMatching(false);
-                    }, 1400);
-                  }} matching={matching} connected={connected} />
-                </div>
+        <section className="grid gap-6">
+          <div className="rounded-[2rem] border border-white/12 card-matte p-6 sm:p-7">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.45em] text-cyan-100/85">Matchmaking</p>
+                <p className="mt-2 text-sm leading-6 text-white/75 sm:text-base">
+                  Open your camera first. Cancel or skip whenever you want.
+                </p>
               </div>
 
-              <TwoScreenPreview user={user} connected={connected} matching={matching} />
+              <div className="flex flex-wrap gap-3">
+                {!matching && !connected ? (
+                  <StartMatchButton onStart={handleStart} />
+                ) : null}
+
+                {matching || connected ? (
+                  <>
+                    <ActionButton onClick={handleCancel} label="Cancel" />
+                    <ActionButton onClick={handleSkip} label="Skip" />
+                  </>
+                ) : null}
+              </div>
             </div>
 
-            <TagPanel title="Interests" items={user?.interests || []} accent="cyan" />
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              <CameraScreen
+                title="You"
+                subtitle={matching ? 'Camera on. Looking for a match.' : connected ? 'Live camera is open.' : 'Click start to open your camera.'}
+                active={matching || connected || cameraReady}
+              >
+                <video
+                  ref={localVideoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="h-full w-full object-cover"
+                />
+              </CameraScreen>
+
+              <CameraScreen
+                title={connected ? partnerName : 'Other user'}
+                subtitle={connected ? 'Ready to talk now.' : matching ? 'Waiting for the next user.' : 'Blank until you start matchmaking.'}
+                active={connected || matching}
+              >
+                <div className="flex h-full w-full flex-col items-center justify-center text-center">
+                  <div className="grid h-16 w-16 place-items-center rounded-full bg-white/6 text-2xl font-semibold text-white">
+                    {connected ? partnerName.slice(0, 1).toUpperCase() : ' '}
+                  </div>
+                  <p className="mt-4 text-sm font-medium text-white/85">
+                    {connected ? partnerName : 'Waiting for a partner'}
+                  </p>
+                  <p className="mt-2 max-w-xs text-sm leading-6 text-white/60">
+                    {connected ? 'Remote camera view appears here when connected.' : 'This screen stays blank until matchmaking begins.'}
+                  </p>
+                </div>
+              </CameraScreen>
+            </div>
           </div>
 
-          <RecentMatches matches={recentMatches} />
+          <TagPanel title="Interests" items={user?.interests || []} accent="cyan" />
         </section>
       </div>
     </main>
   );
 }
 
-function StatPill({ label, value, dark = false }) {
-  return (
-    <div className={`rounded-2xl border px-4 py-3 text-left shadow-sm ${dark ? 'border-white/10 bg-white/10 backdrop-blur-md' : 'border-white/10 bg-white/8'}`}>
-      <p className={`text-xs uppercase tracking-[0.25em] ${dark ? 'text-cyan-100/80' : 'text-white/65'}`}>{label}</p>
-      <p className={`mt-2 text-lg font-semibold text-white`}>{value}</p>
-    </div>
-  );
-}
-
-function StartMatchButton({ onStart, matching, connected }) {
+function StartMatchButton({ onStart }) {
   return (
     <button
       type="button"
       onClick={onStart}
-      disabled={matching || connected}
-      className={`inline-flex min-h-14 items-center justify-center rounded-full px-6 py-3.5 text-base font-semibold transition ${connected ? 'bg-emerald-600 text-white' : 'bg-white/5 text-white'} ${matching ? 'opacity-80 cursor-wait' : ''}`}
+      className="inline-flex min-h-14 items-center justify-center rounded-full border border-white/12 bg-white/5 px-6 py-3.5 text-base font-semibold text-white transition hover:bg-white/10"
     >
-      {matching ? 'Matching...' : connected ? 'Connected' : 'Start matchmaking'}
+      Start matchmaking
     </button>
   );
 }
 
-function TwoScreenPreview({ user, connected, matching }) {
-  const otherName = 'Other User';
-
+function ActionButton({ onClick, label }) {
   return (
-    <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
-      {[0, 1].map((i) => (
-        <div
-          key={i}
-          className="rounded-[1.5rem] border border-white/10 bg-white/5 h-56 md:h-80 flex flex-col items-center justify-center text-white"
-        >
-          {connected ? (
-            <div className="text-center">
-              <div className="h-14 w-14 rounded-full bg-white/5 text-white grid place-items-center text-xl font-semibold mb-3">
-                {i === 0 ? (user?.fullName?.split(' ').map(n => n[0]).slice(0,2).join('') || 'U') : 'O'}
-              </div>
-              <div className="text-sm font-semibold">{i === 0 ? (user?.fullName || 'You') : otherName}</div>
-            </div>
-          ) : (
-            <div className="text-center text-white/60">{matching ? 'Connecting…' : 'Waiting for match'}</div>
-          )}
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex min-h-14 items-center justify-center rounded-full border border-white/12 bg-white/5 px-6 py-3.5 text-base font-semibold text-white transition hover:bg-white/10"
+    >
+      {label}
+    </button>
+  );
+}
+
+function CameraScreen({ title, subtitle, active, children }) {
+  return (
+    <div className="flex min-h-[28rem] flex-col overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#0b1119]">
+      <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+        <div>
+          <p className="text-sm font-semibold text-white">{title}</p>
+          <p className="mt-1 text-xs uppercase tracking-[0.25em] text-white/55">{subtitle}</p>
         </div>
-      ))}
+        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/75">
+          Live
+        </span>
+      </div>
+
+      <div className="relative flex min-h-0 flex-1 items-stretch justify-stretch bg-[#05080d]">
+        {active ? (
+          children
+        ) : (
+          <div className="grid w-full place-items-center px-6 text-center text-white/60">
+            <div>
+              <p className="text-base font-medium text-white/75">Blank screen</p>
+              <p className="mt-2 text-sm leading-6 text-white/55">This stays blank until you start matchmaking.</p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
