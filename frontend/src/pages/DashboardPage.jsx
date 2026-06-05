@@ -110,16 +110,6 @@ export default function DashboardPage() {
 
           <RecentMatches matches={recentMatches} />
         </section>
-
-        <section className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-          <div className="grid gap-6 self-start">
-            <MatchmakingPanel summary={summary} />
-
-            <TagPanel title="Interests" items={user?.interests || []} accent="cyan" />
-          </div>
-
-          <RecentMatches matches={recentMatches} />
-        </section>
       </div>
     </main>
   );
