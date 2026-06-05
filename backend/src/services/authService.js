@@ -77,7 +77,11 @@ export async function upsertOAuthUser(provider, profile) {
 
   existingUser[providerIdField] = existingUser[providerIdField] || providerId;
   existingUser.authProvider = provider;
-  existingUser.profileImage = existingUser.profileImage || profileImage;
+  if (provider === 'linkedin') {
+    existingUser.profileImage = profileImage || existingUser.profileImage;
+  } else {
+    existingUser.profileImage = existingUser.profileImage || profileImage;
+  }
   existingUser.isVerified = true;
 
   if (!existingUser.fullName) {

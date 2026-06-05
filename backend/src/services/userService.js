@@ -11,8 +11,53 @@ function normalizeStringArray(value) {
     .filter(Boolean);
 }
 
+function isLinkedInProfileImage(user) {
+  return Boolean(user?.authProvider === 'linkedin' && typeof user?.profileImage === 'string' && user.profileImage.trim());
+}
+
+async function resolveLinkedInProfileImage(profileImage) {
+  const candidateUrl = String(profileImage || '').trim();
+
+  if (!candidateUrl || candidateUrl.startsWith('data:')) {
+    return candidateUrl;
+  }
+
+  try {
+    const response = await fetch(candidateUrl, {
+      headers: {
+        Accept: 'image/*'
+      }
+    });
+
+    if (!response.ok) {
+      return candidateUrl;
+    }
+
+    const contentType = response.headers.get('content-type') || 'image/jpeg';
+    const imageBuffer = Buffer.from(await response.arrayBuffer());
+    return `data:${contentType};base64,${imageBuffer.toString('base64')}`;
+  } catch {
+    return candidateUrl;
+  }
+}
+
+async function serializeUser(user) {
+  if (!user) {
+    return user;
+  }
+
+  const serializedUser = user.toObject ? user.toObject() : { ...user };
+
+  if (isLinkedInProfileImage(serializedUser)) {
+    serializedUser.profileImage = await resolveLinkedInProfileImage(serializedUser.profileImage);
+  }
+
+  return serializedUser;
+}
+
 export async function getUserProfile(userId) {
-  return User.findById(userId).select('-__v');
+  const user = await User.findById(userId).select('-__v');
+  return serializeUser(user);
 }
 
 export async function updateUserProfile(userId, profileData) {
@@ -87,6 +132,8 @@ export async function getDashboardData(userId) {
     return null;
   }
 
+  const serializedUser = await serializeUser(user);
+
   const recentMatches = await MatchHistory.find({
     $or: [{ user1: userId }, { user2: userId }]
   })
@@ -101,16 +148,16 @@ export async function getDashboardData(userId) {
     .map((match) => mapMatchPartner(match, userId.toString()))
     .filter(Boolean);
 
-  const profileStrength = calculateProfileStrength(user);
+  const profileStrength = calculateProfileStrength(serializedUser);
 
   return {
-    user,
+    user: serializedUser,
     summary: {
       profileStrength,
       activeMatches: mappedMatches.length,
-      networkScore: user.reputationScore || 0,
-      interestsCount: user.interests?.length || 0,
-      goalsCount: user.networkingGoals?.length || 0
+      networkScore: serializedUser.reputationScore || 0,
+      interestsCount: serializedUser.interests?.length || 0,
+      goalsCount: serializedUser.networkingGoals?.length || 0
     },
     recentMatches: mappedMatches
   };
