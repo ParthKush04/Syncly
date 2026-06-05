@@ -191,7 +191,7 @@ export default function DashboardPage() {
   const partnerName = partnerQueue[partnerIndex];
 
   return (
-    <main className="min-h-screen px-4 py-6 text-white sm:px-6 lg:px-10 lg:py-8">
+    <main className="min-h-screen px-4 pb-6 pt-28 text-white sm:px-6 lg:px-10 lg:pt-32 lg:pb-8">
       <div className="pointer-events-none fixed inset-0 -z-10 bg-matte" />
       <div className="mx-auto grid max-w-7xl gap-6">
         <DashboardNavbar user={user || {}} onSignOut={handleSignOut} />

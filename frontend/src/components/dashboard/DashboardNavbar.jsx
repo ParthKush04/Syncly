@@ -11,7 +11,7 @@ export default function DashboardNavbar({ user, onSignOut }) {
   const location = useLocation();
 
   return (
-    <header className="sticky top-3 z-50 mb-4 rounded-[1.75rem] border border-white/12 bg-white/8 px-4 py-3 shadow-lg shadow-black/25 backdrop-blur-2xl sm:px-5">
+    <header className="fixed left-4 right-4 top-4 z-50 mx-auto max-w-7xl rounded-[1.75rem] border border-white/12 bg-white/8 px-4 py-3 shadow-lg shadow-black/25 backdrop-blur-2xl sm:left-6 sm:right-6 sm:px-5 lg:left-10 lg:right-10">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-4">
           <Link to="/dashboard" className="text-white">
