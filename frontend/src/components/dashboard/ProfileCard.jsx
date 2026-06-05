@@ -1,10 +1,7 @@
 import UserAvatar from './UserAvatar.jsx';
 
 export default function ProfileCard({ user, summary }) {
-  const reputation = user.reputationScore ?? 0;
   const interestsCount = user.interests?.length || 0;
-  const goalsCount = user.networkingGoals?.length || 0;
-  const profileStrength = summary?.profileStrength ?? 0;
 
   return (
     <section className="overflow-hidden rounded-[2.25rem] border border-white/12 card-matte shadow-2xl shadow-black/25">
@@ -12,8 +9,8 @@ export default function ProfileCard({ user, summary }) {
         <div className="flex flex-col gap-5 md:flex-row md:items-center">
           <UserAvatar
             fullName={user.fullName}
-            photoUrl={user.photoUrl}
-            sizeClassName="h-20 w-20"
+            photoUrl={user.profileImage || user.photoUrl}
+            sizeClassName="h-24 w-24"
             imageClassName="shadow-[0_16px_40px_rgba(15,23,42,0.35)]"
           />
           <div className="min-w-0 flex-1">
@@ -29,10 +26,8 @@ export default function ProfileCard({ user, summary }) {
             <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-200">{user.bio || 'Add a short bio to introduce your work and what you care about.'}</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:w-[20rem] md:flex-none">
-            <MiniMetric label="Reputation" value={`${reputation}/100`} />
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:w-[20rem] md:flex-none">
             <MiniMetric label="Interests" value={`${interestsCount}`} />
-            <MiniMetric label="Goals" value={`${goalsCount}`} />
             <MiniMetric label="Provider" value={formatProvider(user.authProvider)} />
           </div>
         </div>
@@ -40,10 +35,7 @@ export default function ProfileCard({ user, summary }) {
 
       <div className="grid gap-4 p-6 sm:grid-cols-2 xl:grid-cols-3">
         <InfoRow label="Email" value={user.email} />
-        <InfoRow label="Experience" value={user.experienceLevel} />
         <InfoRow label="LinkedIn" value={user.linkedinUrl || (user.authProvider === 'linkedin' ? 'LinkedIn connected' : 'Not added')} />
-        <InfoRow label="Profile strength" value={`${profileStrength}%`} />
-        <InfoRow label="Reputation" value={`${reputation}/100`} />
         <InfoRow label="Auth provider" value={formatProvider(user.authProvider)} />
       </div>
     </section>
