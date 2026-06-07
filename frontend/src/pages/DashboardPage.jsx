@@ -89,10 +89,37 @@ export default function DashboardPage() {
     const socket = createMatchmakingSocket(token);
     socketRef.current = socket;
 
+    let startupWatch = null;
+
     socket.on('connect', () => {
       console.log('[dashboard] matchmaking socket connected', socket.id);
       socket.emit('matchmaking:join');
+      // clear startup connect watcher
+      if (startupWatch) {
+        clearTimeout(startupWatch);
+        startupWatch = null;
+      }
     });
+
+    // immediate join in case socket is already connected
+    if (socket.connected) {
+      console.log('[dashboard] socket already connected, emitting join');
+      socket.emit('matchmaking:join');
+    }
+
+    // if socket doesn't connect within a few seconds, fallback to full matchmaking page
+    startupWatch = setTimeout(() => {
+      console.warn('[dashboard] matchmaking socket failed to connect quickly; falling back to /matchmaking');
+      try {
+        if (socket && socket.connected) {
+          socket.emit('matchmaking:leave');
+          socket.disconnect();
+        }
+      } catch (_) {}
+      socketRef.current = null;
+      setIsSearching(false);
+      navigate('/matchmaking');
+    }, 4000);
 
     socket.on('matchmaking:queued', (payload) => {
       console.log('[dashboard] queued', payload);
@@ -119,7 +146,10 @@ export default function DashboardPage() {
       }
 
       if (identity && sid) {
+        console.log('[dashboard] joining Stream call', { callId: sid });
         void ensureSessionAndJoin({ identity, callId: sid, callType: 'video' });
+      } else {
+        console.warn('[dashboard] missing identity or session id; cannot join', { identity, sid });
       }
     });
 
@@ -143,7 +173,10 @@ export default function DashboardPage() {
       }
 
       if (identity && sid) {
+        console.log('[dashboard] joining Stream call (match-found)', { callId: sid });
         void ensureSessionAndJoin({ identity, callId: sid, callType: 'video' });
+      } else {
+        console.warn('[dashboard] missing identity or session id (match-found); cannot join', { identity, sid });
       }
     });
 
@@ -186,6 +219,11 @@ export default function DashboardPage() {
     });
 
     socket.on('matchmaking:error', (payload) => console.error('[dashboard] matchmaking:error', payload));
+
+    socket.on('connect_error', (err) => {
+      console.error('[dashboard] socket connect_error', err);
+      setIsSearching(false);
+    });
 
     socket.on('disconnect', () => {
       console.log('[dashboard] matchmaking socket disconnected');

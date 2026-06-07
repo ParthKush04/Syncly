@@ -96,8 +96,8 @@ function VideoFrame({
 
   const sizeClass =
     size === 'preview'
-      ? 'w-full h-[min(32vh,13rem)] sm:h-[min(36vh,15rem)]'
-      : 'w-full h-[min(60vh,36rem)] sm:h-[min(64vh,24rem)] md:h-[min(72vh,30rem)] lg:h-[min(76vh,36rem)]';
+      ? 'aspect-[4/5] w-full min-h-[11rem] sm:aspect-video sm:min-h-[13rem] md:min-h-[15rem]'
+      : 'aspect-[4/5] w-full min-h-[16rem] sm:aspect-video sm:min-h-[24rem] md:min-h-[30rem] lg:min-h-[36rem]';
 
   return (
     <div
