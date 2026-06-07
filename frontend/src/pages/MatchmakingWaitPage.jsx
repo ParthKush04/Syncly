@@ -189,11 +189,11 @@ export default function MatchmakingWaitPage() {
 
   return (
     <main className="min-h-screen px-4 py-8 text-white sm:px-6 lg:px-10 lg:py-10">
-      <div className="mx-auto w-full grid gap-6 grid-cols-1 lg:grid-cols-2 lg:items-start">
+      <div className="mx-auto w-full">
         {/* Two equal-width panels: Camera (left) and Waiting (right) */}
-        <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch min-h-[65vh]">
           {/* Left camera panel */}
-          <section className="rounded-[2rem] card-dark-strong p-6 shadow-2xl shadow-black/30 sm:p-8 w-full flex flex-col">
+          <section className="rounded-[2rem] card-dark-strong p-6 shadow-2xl shadow-black/30 sm:p-8 w-full flex flex-col h-full">
             <div className="flex items-center justify-between">
               <Logo compact className="mb-0" tone="light" />
               <div className="rounded-full border border-emerald-100 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">Active</div>
@@ -240,7 +240,7 @@ export default function MatchmakingWaitPage() {
           </section>
 
           {/* Right waiting panel */}
-          <section className="rounded-[2rem] card-dark p-6 shadow-lg shadow-black/25 w-full flex flex-col">
+          <section className="rounded-[2rem] card-dark p-6 shadow-lg shadow-black/25 w-full flex flex-col h-full">
             <div className="flex items-center justify-between border-b border-white/10 px-1 pb-3">
               <div>
                 <p className="text-sm font-semibold text-white">Waiting for a real user</p>
