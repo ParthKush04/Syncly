@@ -1,10 +1,8 @@
 import DashboardNavbar from '../components/dashboard/DashboardNavbar.jsx';
 import TagPanel from '../components/dashboard/TagPanel.jsx';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getDashboardData } from '../services/dashboardService.js';
-
-const partnerQueue = ['Aarav', 'Maya', 'Riya', 'Arjun'];
 
 function getLinkedInPhotoUrl(user) {
   return user?.authProvider === 'linkedin' ? String(user?.profileImage || user?.photoUrl || '').trim() : '';
@@ -12,14 +10,8 @@ function getLinkedInPhotoUrl(user) {
 
 export default function DashboardPage() {
   const navigate = useNavigate();
-  const localVideoRef = useRef(null);
-  const streamRef = useRef(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [matching, setMatching] = useState(false);
-  const [connected, setConnected] = useState(false);
-  const [cameraReady, setCameraReady] = useState(false);
-  const [partnerIndex, setPartnerIndex] = useState(0);
 
   useEffect(() => {
     let mounted = true;
@@ -67,12 +59,6 @@ export default function DashboardPage() {
     };
   }, []);
 
-  useEffect(() => {
-    return () => {
-      stopCamera();
-    };
-  }, []);
-
   const handleSignOut = async () => {
     try {
       await fetch(`${import.meta.env.VITE_API_URL || 'https://syncly-3nm4.onrender.com'}/api/auth/logout`, {
@@ -86,88 +72,8 @@ export default function DashboardPage() {
     }
   };
 
-  const startCamera = async () => {
-    if (streamRef.current) {
-      return true;
-    }
-
-    if (!navigator.mediaDevices?.getUserMedia) {
-      return false;
-    }
-
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: false
-      });
-
-      streamRef.current = stream;
-
-      if (localVideoRef.current) {
-        localVideoRef.current.srcObject = stream;
-      }
-
-      setCameraReady(true);
-      return true;
-    } catch {
-      setCameraReady(false);
-      return false;
-    }
-  };
-
-  const stopCamera = () => {
-    const stream = streamRef.current;
-
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
-
-    if (localVideoRef.current) {
-      localVideoRef.current.srcObject = null;
-    }
-  };
-
-  const handleStart = async () => {
-    setMatching(true);
-    setConnected(false);
-    const opened = await startCamera();
-
-    if (!opened) {
-      setMatching(false);
-      return;
-    }
-
-    window.setTimeout(() => {
-      setConnected(true);
-      setMatching(false);
-    }, 1200);
-  };
-
-  const handleCancel = () => {
-    stopCamera();
-    setMatching(false);
-    setConnected(false);
-    setCameraReady(false);
-    setPartnerIndex(0);
-  };
-
-  const handleSkip = async () => {
-    setPartnerIndex((current) => (current + 1) % partnerQueue.length);
-    setConnected(false);
-    setMatching(true);
-
-    const opened = await startCamera();
-
-    if (!opened) {
-      setMatching(false);
-      return;
-    }
-
-    window.setTimeout(() => {
-      setConnected(true);
-      setMatching(false);
-    }, 900);
+  const handleStart = () => {
+    navigate('/matchmaking');
   };
 
   const handleAddInterest = (value) => {
@@ -192,8 +98,6 @@ export default function DashboardPage() {
     });
   };
 
-  const partnerName = partnerQueue[partnerIndex];
-
   return (
     <main className="min-h-screen px-4 pb-6 pt-24 text-white sm:px-6 lg:px-10 lg:pt-28 lg:pb-8">
       <div className="pointer-events-none fixed inset-0 -z-10 bg-matte" />
@@ -205,61 +109,47 @@ export default function DashboardPage() {
               <div>
                 <p className="text-xs uppercase tracking-[0.45em] text-cyan-100/85">Matchmaking</p>
                 <p className="mt-2 text-sm leading-6 text-white/75 sm:text-base">
-                  Open your camera first. Cancel or skip whenever you want.
+                  Connect only when a real matched user is available. No placeholder profiles, no fake matches.
                 </p>
               </div>
 
               <div className="flex flex-wrap gap-3">
-                {!matching && !connected ? (
-                  <StartMatchButton onStart={handleStart} />
-                ) : null}
-
-                {matching || connected ? (
-                  <>
-                    <ActionButton onClick={handleCancel} label="Cancel" />
-                    <ActionButton onClick={handleSkip} label="Skip" />
-                  </>
-                ) : null}
+                <StartMatchButton onStart={handleStart} />
               </div>
             </div>
 
             <div className="mt-6 grid gap-4 md:grid-cols-2">
-              <CameraScreen
-                title="You"
-                subtitle={matching ? 'Camera on. Looking for a match.' : connected ? 'Live camera is open.' : 'Click start to open your camera.'}
-                active={matching || connected || cameraReady}
-                showAvatar={matching && !connected}
-                avatarUrl={getLinkedInPhotoUrl(user)}
-                avatarLabel={user?.fullName || 'You'}
-              >
-                <video
-                  ref={localVideoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="h-full w-full object-cover"
-                />
-              </CameraScreen>
-
-              <CameraScreen
-                title={connected ? partnerName : 'Other user'}
-                subtitle={connected ? 'Ready to talk now.' : matching ? 'Waiting for the next user.' : 'Blank until you start matchmaking.'}
-                active={connected || matching}
-                showAvatar={connected}
-                avatarUrl={getLinkedInPhotoUrl(user)}
-                avatarLabel={user?.fullName || 'You'}
-              >
-                {connected ? (
-                  <div className="flex h-full w-full flex-col items-center justify-center text-center">
-                    <p className="mt-4 text-sm font-medium text-white/85">
-                      {partnerName}
-                    </p>
-                    <p className="mt-2 max-w-xs text-sm leading-6 text-white/60">
-                      Remote camera view appears here when connected.
-                    </p>
+              <div className="flex min-h-[22rem] flex-col overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#05080d]">
+                <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+                  <div>
+                    <p className="text-sm font-semibold text-white">Your profile</p>
+                    <p className="mt-1 text-xs uppercase tracking-[0.25em] text-white/55">Ready for matchmaking</p>
                   </div>
-                ) : null}
-              </CameraScreen>
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/75">Live</span>
+                </div>
+                <div className="grid flex-1 place-items-center px-6 text-center text-white/60">
+                  <div>
+                    <p className="text-base font-medium text-white/75">Start matchmaking to connect with a real user.</p>
+                    <p className="mt-2 text-sm leading-6 text-white/55">Your profile will be queued and matched only when another verified member is available.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex min-h-[22rem] flex-col overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#05080d]">
+                <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+                  <div>
+                    <p className="text-sm font-semibold text-white">Waiting for a real user</p>
+                    <p className="mt-1 text-xs uppercase tracking-[0.25em] text-white/55">No match yet</p>
+                  </div>
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/75">Real only</span>
+                </div>
+                <div className="grid flex-1 place-items-center px-6 text-center text-white/60">
+                  <div>
+                    <p className="text-base font-medium text-white/75">You will only connect once another verified user is also in the matchmaking queue.</p>
+                    <p className="mt-2 text-sm leading-6 text-white/55">If no user is available yet, we keep searching and do not connect until the match is real.</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
