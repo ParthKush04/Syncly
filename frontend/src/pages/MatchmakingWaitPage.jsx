@@ -200,14 +200,14 @@ export default function MatchmakingWaitPage() {
             </div>
 
             <div className="mt-6 flex-1 flex flex-col w-full">
-              <div className="flex-1 rounded-[2rem] card-dark p-6 w-full min-h-[22rem] flex items-center justify-center overflow-hidden">
+              <div className="flex-1 w-full overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/80 flex items-center justify-center min-h-[22rem]">
                 {/* Video/image should fill available space */}
                 {matchPartner ? (
-                  <div className="w-full h-full flex flex-col items-center justify-center gap-4">
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-4 px-6 py-4">
                     <img
                       src={matchPartner.profileImage}
                       alt={matchPartner.fullName || matchPartner.name || 'Matched professional'}
-                      className="max-h-36 h-36 w-36 rounded-full object-cover border border-white/10 shadow-2xl"
+                      className="max-h-36 h-36 w-36 rounded-full object-cover shadow-2xl"
                     />
                     <div className="text-center w-full">
                       <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">Match found</p>
@@ -216,7 +216,7 @@ export default function MatchmakingWaitPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center">
+                  <div className="w-full h-full flex flex-col items-center justify-center px-6 py-4">
                     <div className="flex-1 w-full flex items-center justify-center">
                       <SearchingOrb />
                     </div>
