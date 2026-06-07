@@ -198,6 +198,12 @@ class MatchmakingQueue {
     const tokenFromCookie = MatchmakingQueue.parseCookies(socket.handshake.headers.cookie).token;
     const token = tokenFromAuth || tokenFromCookie;
 
+    console.log('[matchmaking] authenticateSocket token sources', {
+      tokenFromAuth: Boolean(tokenFromAuth),
+      tokenFromCookie: Boolean(tokenFromCookie),
+      socketId: socket.id
+    });
+
     if (!token) {
       socket.emit('matchmaking:error', { message: 'Authentication token missing' });
       socket.disconnect(true);
@@ -264,6 +270,7 @@ class MatchmakingQueue {
 
     this.isProcessingQueue = true;
     console.log(`[matchmaking] matchmaking attempt with queue size=${this.queue.length}`);
+    console.log('[matchmaking] current queue snapshot before matching:', JSON.stringify(this.queue.map(e => ({ userId: e.userId, socketId: e.socketId, isMatching: e.isMatching })), null, 2));
 
     try {
       while (this.queue.length >= 2) {
@@ -280,8 +287,23 @@ class MatchmakingQueue {
         }
 
         if (currentEntry.isMatching || candidateEntry.isMatching) {
-          console.log('[matchmaking] one of the entries is already matching, skipping');
-          return;
+          console.log('[matchmaking] one of the entries is already matching', {
+            currentEntry: { userId: currentEntry.userId, isMatching: currentEntry.isMatching },
+            candidateEntry: { userId: candidateEntry.userId, isMatching: candidateEntry.isMatching }
+          });
+
+          // Instead of aborting the entire matchmaking run, skip the entry that is already matching
+          if (currentEntry.isMatching) {
+            console.log('[matchmaking] removing currentEntry from queue due to isMatching=true', currentEntry.userId);
+            this.queue.splice(0, 1);
+            continue;
+          }
+
+          if (candidateEntry.isMatching) {
+            console.log('[matchmaking] removing candidateEntry from queue due to isMatching=true', candidateEntry.userId);
+            this.queue.splice(1, 1);
+            continue;
+          }
         }
 
         currentEntry.isMatching = true;
@@ -355,6 +377,13 @@ class MatchmakingQueue {
             `[matchmaking] successful match userId=${currentEntry.userId} socketId=${currentEntry.socketId} <-> userId=${candidateEntry.userId} socketId=${candidateEntry.socketId}`
           );
           console.log(`[matchmaking] shared video room sessionId=${roomSession.sessionId}`);
+
+          // Log the created match
+          console.log('MATCH CREATED', {
+            userA: currentEntry.userId,
+            userB: candidateEntry.userId,
+            sessionId: roomSession.sessionId
+          });
 
           this.emitToUser(currentEntry.socketId, 'match-found', payloadForCurrent);
           this.emitToUser(candidateEntry.socketId, 'match-found', payloadForCandidate);
@@ -443,6 +472,7 @@ class MatchmakingQueue {
     console.log(
       `[matchmaking] user joined queue userId=${userId} socketId=${socket.id} provider=${currentUser.authProvider || 'unknown'}`
     );
+    console.log('QUEUE LENGTH:', this.queue.length);
     this.logQueueState(`after join userId=${userId}`);
 
     socket.emit('matchmaking:queued', {

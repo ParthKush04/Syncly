@@ -189,109 +189,91 @@ export default function MatchmakingWaitPage() {
 
   return (
     <main className="min-h-screen px-4 py-8 text-white sm:px-6 lg:px-10 lg:py-10">
-      <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-        <section className="rounded-[2rem] card-dark-strong p-6 shadow-2xl shadow-black/30 sm:p-8">
-          <Logo compact className="mb-5" tone="light" />
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">Matchmaking queue</p>
-              <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">We’re finding a great connection</h1>
+      <div className="mx-auto w-full grid gap-6 grid-cols-1 lg:grid-cols-2 lg:items-start">
+        {/* Two equal-width panels: Camera (left) and Waiting (right) */}
+        <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left camera panel */}
+          <section className="rounded-[2rem] card-dark-strong p-6 shadow-2xl shadow-black/30 sm:p-8 w-full flex flex-col">
+            <div className="flex items-center justify-between">
+              <Logo compact className="mb-0" tone="light" />
+              <div className="rounded-full border border-emerald-100 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">Active</div>
             </div>
 
-            <div className="rounded-full border border-emerald-100 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">
-              Active
-            </div>
-          </div>
-
-          <div className="mt-8 grid place-items-center rounded-[2rem] card-dark p-6">
-            {matchPartner ? (
-              <div className="grid place-items-center gap-4 text-center">
-                {matchPartner.profileImage ? (
-                  <img
-                    src={matchPartner.profileImage}
-                    alt={matchPartner.fullName || matchPartner.name || 'Matched professional'}
-                    className="h-28 w-28 rounded-full object-cover border border-white/10 shadow-2xl"
-                  />
+            <div className="mt-6 flex-1 flex flex-col w-full">
+              <div className="flex-1 rounded-[2rem] card-dark p-6 w-full min-h-[22rem] flex items-center justify-center overflow-hidden">
+                {/* Video/image should fill available space */}
+                {matchPartner ? (
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-4">
+                    <img
+                      src={matchPartner.profileImage}
+                      alt={matchPartner.fullName || matchPartner.name || 'Matched professional'}
+                      className="max-h-36 h-36 w-36 rounded-full object-cover border border-white/10 shadow-2xl"
+                    />
+                    <div className="text-center w-full">
+                      <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">Match found</p>
+                      <p className="mt-3 text-2xl font-semibold text-white">{matchPartner.fullName || matchPartner.name || 'A verified professional'}</p>
+                      {matchPartner.profession ? <p className="mt-2 text-sm text-white/70">{matchPartner.profession}</p> : null}
+                    </div>
+                  </div>
                 ) : (
-                  <div className="grid h-28 w-28 place-items-center rounded-full border border-white/10 bg-slate-950 text-3xl font-semibold text-white/80 shadow-2xl">
-                    {String(matchPartner.fullName || matchPartner.name || '')
-                      .split(/\s+/)
-                      .filter(Boolean)
-                      .slice(0, 2)
-                      .map((part) => part[0]?.toUpperCase())
-                      .join('') || '??'}
+                  <div className="w-full h-full flex flex-col items-center justify-center">
+                    <div className="flex-1 w-full flex items-center justify-center">
+                      <SearchingOrb />
+                    </div>
+                    <p className="text-sm uppercase tracking-[0.45em] text-white/80 mt-4">Searching</p>
                   </div>
                 )}
+              </div>
 
+              <div className="mt-6 rounded-3xl card-dark p-5 w-full">
+                <div className="flex items-center justify-between gap-4 text-sm text-white/80">
+                  <span>{errorMessage || statusMessage || progressMessages[messageIndex]}</span>
+                  <span>{progress}%</span>
+                </div>
+                <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/6">
+                  <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-700" style={{ width: `${progress}%` }} />
+                </div>
+                {queueSize !== null ? <p className="mt-3 text-xs uppercase tracking-[0.3em] text-white/60">Queue size: {queueSize}</p> : null}
+                {matchPartner ? <p className="mt-3 text-sm font-medium text-emerald-300">Matched with {matchPartner?.fullName || 'a professional'}</p> : null}
+              </div>
+            </div>
+          </section>
+
+          {/* Right waiting panel */}
+          <section className="rounded-[2rem] card-dark p-6 shadow-lg shadow-black/25 w-full flex flex-col">
+            <div className="flex items-center justify-between border-b border-white/10 px-1 pb-3">
+              <div>
+                <p className="text-sm font-semibold text-white">Waiting for a real user</p>
+                <p className="mt-1 text-xs uppercase tracking-[0.25em] text-white/55">No match yet</p>
+              </div>
+              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/75">Real only</span>
+            </div>
+
+            <div className="flex-1 grid place-items-center px-6 text-center text-white/60">
+              <div>
+                <p className="text-base font-medium text-white/75">You will only connect once another verified user is also in the matchmaking queue.</p>
+                <p className="mt-2 text-sm leading-6 text-white/55">If no user is available yet, we keep searching and do not connect until the match is real.</p>
+              </div>
+            </div>
+
+            <div className="mt-6 w-full">
+              <div className="grid gap-6">
                 <div>
-                  <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">Match found</p>
-                  <p className="mt-3 text-2xl font-semibold text-white">
-                    {matchPartner.fullName || matchPartner.name || 'A verified professional'}
-                  </p>
-                  {matchPartner.profession ? (
-                    <p className="mt-2 text-sm text-white/70">{matchPartner.profession}</p>
-                  ) : null}
+                  <h3 className="text-sm uppercase tracking-[0.35em] text-cyan-300">Matching preferences</h3>
+                  <div className="mt-3">
+                    <PreferenceChip label="Interests" value={interests.length > 0 ? interests.join(', ') : 'No interests set yet'} />
+                  </div>
+                </div>
+
+                <div className="rounded-[1rem] card-dark-strong p-4">
+                  <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">Queue controls</p>
+                  <p className="mt-3 text-sm leading-7 text-white/75">You can leave the matchmaking queue at any time and return when you’re ready to connect again.</p>
+                  <button type="button" onClick={() => navigate('/dashboard')} className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-rose-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-rose-400">Cancel matchmaking</button>
                 </div>
               </div>
-            ) : (
-              <div className="grid place-items-center gap-4">
-                <SearchingOrb />
-                <p className="text-sm uppercase tracking-[0.45em] text-white/80">Searching</p>
-              </div>
-            )}
-          </div>
-
-          <div className="mt-6 rounded-3xl card-dark p-5">
-            <div className="flex items-center justify-between gap-4 text-sm text-white/80">
-              <span>{errorMessage || statusMessage || progressMessages[messageIndex]}</span>
-              <span>{progress}%</span>
-            </div>
-            <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/6">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-700"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            {queueSize !== null ? <p className="mt-3 text-xs uppercase tracking-[0.3em] text-white/60">Queue size: {queueSize}</p> : null}
-            {matchPartner ? <p className="mt-3 text-sm font-medium text-emerald-300">Matched with {matchPartner?.fullName || 'a professional'}</p> : null}
-          </div>
-        </section>
-
-        <aside className="grid gap-6 self-start">
-          <StatusCard
-            title="User status"
-            value="Searching for a match"
-            description="Your profile is live in the queue and will connect with another user as soon as they join."
-          />
-          <section className="rounded-[2rem] card-dark p-6 shadow-lg shadow-black/25">
-            <div className="flex items-center justify-between gap-4">
-              <h2 className="text-lg font-semibold text-white">Matching preferences</h2>
-            </div>
-
-            <div className="mt-5 grid gap-3 sm:grid-cols-1">
-              <PreferenceChip
-                label="Interests"
-                value={interests.length > 0 ? interests.join(', ') : 'No interests set yet'}
-              />
             </div>
           </section>
-
-          <section className="rounded-[2rem] card-dark-strong p-6 shadow-2xl shadow-black/30">
-            <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">Queue controls</p>
-            <h2 className="mt-3 text-2xl font-semibold text-white">Ready to stop searching?</h2>
-            <p className="mt-3 text-sm leading-7 text-white/75">
-              You can leave the matchmaking queue at any time and return when you’re ready to connect again.
-            </p>
-
-            <button
-              type="button"
-              onClick={() => navigate('/dashboard')}
-              className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-rose-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-rose-400"
-            >
-              Cancel matchmaking
-            </button>
-          </section>
-        </aside>
+        </div>
       </div>
     </main>
   );
