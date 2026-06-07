@@ -6,18 +6,11 @@ import StatusCard from '../components/matchmaking/StatusCard.jsx';
 import PreferenceChip from '../components/matchmaking/PreferenceChip.jsx';
 import { createMatchmakingSocket } from '../services/socketService.js';
 
-const preferenceItems = [
-  { label: 'Interests', value: 'Product, AI, Founder growth' },
-  { label: 'Goals', value: 'Meet cofounders, investors, operators' },
-  { label: 'Experience', value: 'Senior to executive' },
-  { label: 'Availability', value: 'Now' }
-];
-
 const progressMessages = [
-  'Scanning verified profiles...',
-  'Comparing interests and networking goals...',
-  'Ranking experience alignment...',
-  'Preparing your best match...'
+  'Scanning the queue...',
+  'Looking for the next live connection...',
+  'Waiting for another user to join...',
+  'Preparing your best real match...'
 ];
 
 export default function MatchmakingWaitPage() {
@@ -32,6 +25,7 @@ export default function MatchmakingWaitPage() {
   const [statusMessage, setStatusMessage] = useState('Connecting to matchmaking...');
   const [queueSize, setQueueSize] = useState(null);
   const [matchPartner, setMatchPartner] = useState(null);
+  const [interests, setInterests] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
@@ -41,6 +35,23 @@ export default function MatchmakingWaitPage() {
     }, 1800);
 
     return () => window.clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
+    const userJson = localStorage.getItem('synclyUser');
+
+    if (!userJson) {
+      setInterests([]);
+      return;
+    }
+
+    try {
+      const user = JSON.parse(userJson);
+      const profileInterests = Array.isArray(user?.interests) ? user.interests : [];
+      setInterests(profileInterests.map((interest) => String(interest).trim()).filter(Boolean));
+    } catch {
+      setInterests([]);
+    }
   }, []);
 
   useEffect(() => {
@@ -250,18 +261,18 @@ export default function MatchmakingWaitPage() {
           <StatusCard
             title="User status"
             value="Searching for a match"
-            description="Your profile is live in the queue and being compared with professionals who share your goals and interests."
+            description="Your profile is live in the queue and will connect with another user as soon as they join."
           />
           <section className="rounded-[2rem] card-dark p-6 shadow-lg shadow-black/25">
             <div className="flex items-center justify-between gap-4">
               <h2 className="text-lg font-semibold text-white">Matching preferences</h2>
-              <span className="rounded-full border border-white/10 bg-[rgba(255,255,255,0.03)] px-3 py-1 text-xs text-white/70">Smart filter</span>
             </div>
 
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              {preferenceItems.map((item) => (
-                <PreferenceChip key={item.label} label={item.label} value={item.value} />
-              ))}
+            <div className="mt-5 grid gap-3 sm:grid-cols-1">
+              <PreferenceChip
+                label="Interests"
+                value={interests.length > 0 ? interests.join(', ') : 'No interests set yet'}
+              />
             </div>
           </section>
 

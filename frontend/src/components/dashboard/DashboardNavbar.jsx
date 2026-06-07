@@ -19,7 +19,7 @@ export default function DashboardNavbar({ user, onSignOut }) {
       <div className="mx-auto flex max-w-7xl flex-col gap-3 px-3 py-2 sm:px-4 sm:py-2.5 lg:flex-row lg:items-center lg:justify-between lg:px-10">
         <div className="flex items-center gap-3 sm:gap-4">
           <Link to="/dashboard" className="text-white">
-            <Logo />
+            <Logo tone="light" />
           </Link>
 
           <div className="hidden h-10 w-px bg-white/10 lg:block" />

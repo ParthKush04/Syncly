@@ -119,20 +119,8 @@ export default function DashboardPage() {
             </div>
 
             <div className="mt-6 grid gap-4 md:grid-cols-2">
-              <div className="flex min-h-[22rem] flex-col overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#05080d]">
-                <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
-                  <div>
-                    <p className="text-sm font-semibold text-white">Your profile</p>
-                    <p className="mt-1 text-xs uppercase tracking-[0.25em] text-white/55">Ready for matchmaking</p>
-                  </div>
-                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/75">Live</span>
-                </div>
-                <div className="grid flex-1 place-items-center px-6 text-center text-white/60">
-                  <div>
-                    <p className="text-base font-medium text-white/75">Start matchmaking to connect with a real user.</p>
-                    <p className="mt-2 text-sm leading-6 text-white/55">Your profile will be queued and matched only when another verified member is available.</p>
-                  </div>
-                </div>
+              <div className="flex min-h-[22rem] items-center justify-center overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#05080d] px-6 text-center text-white/75">
+                <p className="text-lg font-medium">Start matchmaking to connect with real users.</p>
               </div>
 
               <div className="flex min-h-[22rem] flex-col overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#05080d]">

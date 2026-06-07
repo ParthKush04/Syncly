@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import MatchHistory from '../models/MatchHistory.js';
-import { calculateCompatibilityScore, normalizeMatchProfile } from '../services/matchmakingService.js';
+import { normalizeMatchProfile } from '../services/matchmakingService.js';
 import { createCallSession } from '../services/callService.js';
 
 class MatchmakingQueue {
@@ -39,53 +39,6 @@ class MatchmakingQueue {
       profileImage: user.profileImage || '',
       userId: user._id.toString()
     };
-  }
-
-  static isEligibleUser(user) {
-    if (!user) {
-      return false;
-    }
-
-    const hasProfileData = Boolean(
-      String(user.fullName || '').trim() &&
-      (
-        (Array.isArray(user.interests) && user.interests.length > 0) ||
-        (Array.isArray(user.networkingGoals) && user.networkingGoals.length > 0) ||
-        String(user.profession || '').trim() ||
-        String(user.company || '').trim()
-      )
-    );
-
-    const hasTrustSignal = Boolean(user.isVerified || (typeof user.reputationScore === 'number' && user.reputationScore >= 20));
-    return hasProfileData && hasTrustSignal;
-  }
-
-  static isQualifyingCandidate(entry) {
-    return (
-      entry &&
-      !entry.isMatching &&
-      Boolean(entry.profile?.fullName) &&
-      Boolean(entry.profile?.interests?.length || entry.profile?.networkingGoals?.length || entry.profile?.profession || entry.profile?.company) &&
-      Boolean(entry.isVerified || (typeof entry.reputationScore === 'number' && entry.reputationScore >= 20))
-    );
-  }
-
-  findBestCandidateFor(currentEntry) {
-    const candidates = this.queue
-      .filter((entry) => entry.userId !== currentEntry.userId)
-      .filter(MatchmakingQueue.isQualifyingCandidate);
-
-    if (!candidates.length) {
-      return null;
-    }
-
-    const scoredCandidates = candidates.map((candidate) => ({
-      entry: candidate,
-      score: calculateCompatibilityScore(currentEntry.profile, candidate.profile)
-    }));
-
-    scoredCandidates.sort((a, b) => b.score - a.score);
-    return scoredCandidates[0]?.entry || null;
   }
 
   logQueueState(context) {
@@ -234,24 +187,9 @@ class MatchmakingQueue {
 
     try {
       while (this.queue.length >= 2) {
-        let currentEntry = null;
-        let candidateEntry = null;
-
-        for (const entry of this.queue) {
-          if (entry.isMatching || !MatchmakingQueue.isQualifyingCandidate(entry)) {
-            continue;
-          }
-
-          const bestCandidate = this.findBestCandidateFor(entry);
-          if (bestCandidate) {
-            currentEntry = entry;
-            candidateEntry = bestCandidate;
-            break;
-          }
-        }
+        const [currentEntry, candidateEntry] = this.queue;
 
         if (!currentEntry || !candidateEntry) {
-          console.log('[matchmaking] no viable match candidates available after filtering');
           break;
         }
 
@@ -397,14 +335,6 @@ class MatchmakingQueue {
 
     if (!freshUser) {
       socket.emit('matchmaking:error', { message: 'User profile not found' });
-      return;
-    }
-
-    if (!MatchmakingQueue.isEligibleUser(freshUser)) {
-      socket.emit('matchmaking:error', {
-        message:
-          'Your account must be verified and have completed profile details before connecting with real professionals. Please verify your account and update your interests, goals, or experience.'
-      });
       return;
     }
 
