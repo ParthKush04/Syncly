@@ -6,6 +6,10 @@ import { getDashboardData } from '../services/dashboardService.js';
 
 const partnerQueue = ['Aarav', 'Maya', 'Riya', 'Arjun'];
 
+function getLinkedInPhotoUrl(user) {
+  return user?.authProvider === 'linkedin' ? String(user?.profileImage || user?.photoUrl || '').trim() : '';
+}
+
 export default function DashboardPage() {
   const navigate = useNavigate();
   const localVideoRef = useRef(null);
@@ -27,7 +31,7 @@ export default function DashboardPage() {
         if (mounted && data?.user) {
           const normalizedUser = {
             ...data.user,
-            photoUrl: data.user.profileImage || data.user.photoUrl || ''
+            photoUrl: getLinkedInPhotoUrl(data.user)
           };
 
           setUser(normalizedUser);
@@ -42,7 +46,7 @@ export default function DashboardPage() {
               const parsedUser = JSON.parse(savedUser);
               setUser({
                 ...parsedUser,
-                photoUrl: parsedUser.profileImage || parsedUser.photoUrl || ''
+                photoUrl: getLinkedInPhotoUrl(parsedUser)
               });
             } catch {
               setUser(null);
@@ -191,7 +195,7 @@ export default function DashboardPage() {
   const partnerName = partnerQueue[partnerIndex];
 
   return (
-    <main className="min-h-screen px-4 pb-6 pt-28 text-white sm:px-6 lg:px-10 lg:pt-32 lg:pb-8">
+    <main className="min-h-screen px-4 pb-6 pt-24 text-white sm:px-6 lg:px-10 lg:pt-28 lg:pb-8">
       <div className="pointer-events-none fixed inset-0 -z-10 bg-matte" />
       <div className="mx-auto grid max-w-7xl gap-6">
         <DashboardNavbar user={user || {}} onSignOut={handleSignOut} />
@@ -225,7 +229,7 @@ export default function DashboardPage() {
                 subtitle={matching ? 'Camera on. Looking for a match.' : connected ? 'Live camera is open.' : 'Click start to open your camera.'}
                 active={matching || connected || cameraReady}
                 showAvatar={matching && !connected}
-                avatarUrl={user?.profileImage || user?.photoUrl || ''}
+                avatarUrl={getLinkedInPhotoUrl(user)}
                 avatarLabel={user?.fullName || 'You'}
               >
                 <video
@@ -242,7 +246,7 @@ export default function DashboardPage() {
                 subtitle={connected ? 'Ready to talk now.' : matching ? 'Waiting for the next user.' : 'Blank until you start matchmaking.'}
                 active={connected || matching}
                 showAvatar={connected}
-                avatarUrl={user?.profileImage || user?.photoUrl || ''}
+                avatarUrl={getLinkedInPhotoUrl(user)}
                 avatarLabel={user?.fullName || 'You'}
               >
                 {connected ? (

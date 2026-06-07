@@ -193,7 +193,41 @@ export default function MatchmakingWaitPage() {
           </div>
 
           <div className="mt-8 grid place-items-center rounded-[2rem] card-dark p-6">
-            <SearchingOrb />
+            {matchPartner ? (
+              <div className="grid place-items-center gap-4 text-center">
+                {matchPartner.profileImage ? (
+                  <img
+                    src={matchPartner.profileImage}
+                    alt={matchPartner.fullName || matchPartner.name || 'Matched professional'}
+                    className="h-28 w-28 rounded-full object-cover border border-white/10 shadow-2xl"
+                  />
+                ) : (
+                  <div className="grid h-28 w-28 place-items-center rounded-full border border-white/10 bg-slate-950 text-3xl font-semibold text-white/80 shadow-2xl">
+                    {String(matchPartner.fullName || matchPartner.name || '')
+                      .split(/\s+/)
+                      .filter(Boolean)
+                      .slice(0, 2)
+                      .map((part) => part[0]?.toUpperCase())
+                      .join('') || '??'}
+                  </div>
+                )}
+
+                <div>
+                  <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">Match found</p>
+                  <p className="mt-3 text-2xl font-semibold text-white">
+                    {matchPartner.fullName || matchPartner.name || 'A verified professional'}
+                  </p>
+                  {matchPartner.profession ? (
+                    <p className="mt-2 text-sm text-white/70">{matchPartner.profession}</p>
+                  ) : null}
+                </div>
+              </div>
+            ) : (
+              <div className="grid place-items-center gap-4">
+                <SearchingOrb />
+                <p className="text-sm uppercase tracking-[0.45em] text-white/80">Searching</p>
+              </div>
+            )}
           </div>
 
           <div className="mt-6 rounded-3xl card-dark p-5">

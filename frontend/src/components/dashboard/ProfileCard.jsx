@@ -1,5 +1,9 @@
 import UserAvatar from './UserAvatar.jsx';
 
+function getLinkedInPhotoUrl(user) {
+  return user?.authProvider === 'linkedin' ? String(user?.profileImage || user?.photoUrl || '').trim() : '';
+}
+
 export default function ProfileCard({ user, summary }) {
   const interestsCount = user.interests?.length || 0;
 
@@ -9,7 +13,7 @@ export default function ProfileCard({ user, summary }) {
         <div className="flex flex-col gap-5 md:flex-row md:items-center">
           <UserAvatar
             fullName={user.fullName}
-            photoUrl={user.profileImage || user.photoUrl}
+            photoUrl={getLinkedInPhotoUrl(user)}
             sizeClassName="h-24 w-24"
             imageClassName="shadow-[0_16px_40px_rgba(15,23,42,0.35)]"
           />

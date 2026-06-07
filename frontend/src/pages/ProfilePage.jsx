@@ -5,6 +5,10 @@ import ProfileCard from '../components/dashboard/ProfileCard.jsx';
 import TagPanel from '../components/dashboard/TagPanel.jsx';
 import { getDashboardData } from '../services/dashboardService.js';
 
+function getLinkedInPhotoUrl(user) {
+  return user?.authProvider === 'linkedin' ? String(user?.profileImage || user?.photoUrl || '').trim() : '';
+}
+
 export default function ProfilePage() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -20,7 +24,7 @@ export default function ProfilePage() {
         if (mounted && data?.user) {
           const normalizedUser = {
             ...data.user,
-            photoUrl: data.user.profileImage || data.user.photoUrl || ''
+            photoUrl: getLinkedInPhotoUrl(data.user)
           };
 
           setUser(normalizedUser);
@@ -35,7 +39,7 @@ export default function ProfilePage() {
               const parsedUser = JSON.parse(savedUser);
               setUser({
                 ...parsedUser,
-                photoUrl: parsedUser.profileImage || parsedUser.photoUrl || ''
+                photoUrl: getLinkedInPhotoUrl(parsedUser)
               });
             } catch {
               setUser(null);
@@ -92,7 +96,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <main className="min-h-screen px-4 pb-4 pt-28 text-slate-900 sm:px-6 lg:px-10 lg:pt-32 lg:pb-6">
+    <main className="min-h-screen px-4 pb-4 pt-24 text-slate-900 sm:px-6 lg:px-10 lg:pt-28 lg:pb-6">
       <div className="pointer-events-none fixed inset-0 -z-10 bg-[linear-gradient(180deg,rgba(248,250,252,0.98),rgba(241,245,249,0.94)),radial-gradient(circle_at_top_left,rgba(56,189,248,0.16),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(99,102,241,0.12),transparent_26%)]" />
 
       <div className="mx-auto grid max-w-7xl gap-6">
