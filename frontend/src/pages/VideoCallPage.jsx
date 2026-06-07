@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import Logo from '../components/branding/Logo.jsx';
 import VideoRoom from '../components/video/VideoRoom.jsx';
 import { useStreamVideoSession } from '../context/StreamVideoSessionContext.jsx';
+import { createMatchmakingSocket } from '../services/socketService.js';
 
 export default function VideoCallPage() {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ export default function VideoCallPage() {
   const [isExitingCall, setIsExitingCall] = useState(false);
   const joinKeyRef = useRef('');
   const exitInProgressRef = useRef(false);
+  const socketRef = useRef(null);
 
   useEffect(() => {
     const token = localStorage.getItem('synclyToken');
@@ -76,6 +78,56 @@ export default function VideoCallPage() {
     };
   }, [ensureSessionAndJoin, searchParams, setCallId, setCallType, setError]);
 
+  // Setup a matchmaking socket for call control (skip / cancel) so peers can be notified
+  useEffect(() => {
+    const token = localStorage.getItem('synclyToken');
+    if (!token) return undefined;
+
+    const socket = createMatchmakingSocket(token);
+    socketRef.current = socket;
+
+    const handleSkipped = (payload) => {
+      const sessionId = payload?.sessionId || '';
+      if (!sessionId || sessionId === (searchParams.get('callId') || searchParams.get('sessionId') || '')) {
+        // navigate to matchmaking for skipped sessions
+        void exitAndNavigate('/matchmaking', 'skipped-by-peer');
+      }
+    };
+
+    const handleCancelled = (payload) => {
+      const sessionId = payload?.sessionId || '';
+      const initiator = payload?.initiator;
+      const userJson = localStorage.getItem('synclyUser');
+      let authUserId = '';
+      try {
+        authUserId = String(JSON.parse(userJson)?._id || '').trim();
+      } catch {
+        authUserId = '';
+      }
+
+      // If another user cancelled, requeue this user by navigating back to matchmaking
+      if (sessionId === (searchParams.get('callId') || searchParams.get('sessionId') || '') && initiator !== authUserId) {
+        void exitAndNavigate('/matchmaking', 'partner_cancelled');
+      }
+    };
+
+    socket.on('call:skipped', handleSkipped);
+    socket.on('call:cancelled', handleCancelled);
+
+    socket.on('matchmaking:error', (payload) => {
+      console.error('[call socket] matchmaking error', payload);
+    });
+
+    return () => {
+      try {
+        socket.off('call:skipped', handleSkipped);
+        socket.off('call:cancelled', handleCancelled);
+        socket.disconnect();
+      } catch (_) {}
+      socketRef.current = null;
+    };
+  }, [exitAndNavigate, searchParams]);
+
   const exitAndNavigate = useCallback(
     async (destination, reason) => {
       if (exitInProgressRef.current) {
@@ -106,7 +158,31 @@ export default function VideoCallPage() {
   );
 
   const handleSkip = useCallback(() => exitAndNavigate('/matchmaking', 'skip'), [exitAndNavigate]);
-  const handleLeave = useCallback(() => exitAndNavigate('/dashboard', 'leave-dashboard'), [exitAndNavigate]);
+  const handleSkipEmit = useCallback(() => {
+    const socket = socketRef.current;
+    const callId = searchParams.get('callId') || searchParams.get('sessionId') || '';
+    if (socket && callId) {
+      try {
+        socket.emit('call:skip', { sessionId: callId });
+      } catch (e) {
+        console.error('failed to emit skip', e);
+      }
+    }
+    void exitAndNavigate('/matchmaking', 'skip');
+  }, [exitAndNavigate, searchParams]);
+
+  const handleLeave = useCallback(() => {
+    const socket = socketRef.current;
+    const callId = searchParams.get('callId') || searchParams.get('sessionId') || '';
+    if (socket && callId) {
+      try {
+        socket.emit('call:cancel', { sessionId: callId });
+      } catch (e) {
+        console.error('failed to emit cancel', e);
+      }
+    }
+    void exitAndNavigate('/dashboard', 'leave-dashboard');
+  }, [exitAndNavigate, searchParams]);
 
   const callStatusLabel = useMemo(() => {
     if (isExitingCall) {
@@ -132,7 +208,7 @@ export default function VideoCallPage() {
           <VideoRoom
             joining={status === 'joining'}
             status={callStatusLabel}
-            onSkip={handleSkip}
+            onSkip={handleSkipEmit}
             onLeave={handleLeave}
             isExitingCall={isExitingCall}
           />

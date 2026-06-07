@@ -96,8 +96,8 @@ function VideoFrame({
 
   const sizeClass =
     size === 'preview'
-      ? 'aspect-[4/5] w-full min-h-[11rem] sm:aspect-video sm:min-h-[13rem] md:min-h-[15rem]'
-      : 'aspect-[4/5] w-full min-h-[16rem] sm:aspect-video sm:min-h-[24rem] md:min-h-[30rem] lg:min-h-[36rem]';
+      ? 'w-full h-[min(32vh,13rem)] sm:h-[min(36vh,15rem)]'
+      : 'w-full h-[min(60vh,36rem)] sm:h-[min(64vh,24rem)] md:h-[min(72vh,30rem)] lg:h-[min(76vh,36rem)]';
 
   return (
     <div
@@ -128,8 +128,8 @@ function VideoFrame({
         </div>
       )}
 
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-matte" />
+      {/* Subtle overlay (non-blocking) so video is visible */}
+      <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-slate-950/10 via-transparent to-transparent" />
 
       {/* Top label */}
       <div className="absolute left-4 top-4 rounded-full border border-white/10 bg-black/40 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-white/85 backdrop-blur-sm">

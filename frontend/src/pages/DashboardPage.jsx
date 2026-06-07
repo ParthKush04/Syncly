@@ -1,8 +1,11 @@
 import DashboardNavbar from '../components/dashboard/DashboardNavbar.jsx';
 import TagPanel from '../components/dashboard/TagPanel.jsx';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getDashboardData } from '../services/dashboardService.js';
+import { createMatchmakingSocket } from '../services/socketService.js';
+import VideoRoom from '../components/video/VideoRoom.jsx';
+import { useStreamVideoSession } from '../context/StreamVideoSessionContext.jsx';
 
 function getLinkedInPhotoUrl(user) {
   return user?.authProvider === 'linkedin' ? String(user?.profileImage || user?.photoUrl || '').trim() : '';
@@ -12,6 +15,11 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const socketRef = useRef(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [matchPartner, setMatchPartner] = useState(null);
+  const [sessionId, setSessionId] = useState('');
+  const { ensureSessionAndJoin, leaveCall, disconnect, isInCall, status, isConnected } = useStreamVideoSession();
 
   useEffect(() => {
     let mounted = true;
@@ -73,7 +81,115 @@ export default function DashboardPage() {
   };
 
   const handleStart = () => {
-    navigate('/matchmaking');
+    // start inline matchmaking on dashboard
+    setIsSearching(true);
+    const token = localStorage.getItem('synclyToken');
+    if (!token) return;
+
+    const socket = createMatchmakingSocket(token);
+    socketRef.current = socket;
+
+    socket.on('connect', () => {
+      console.log('[dashboard] matchmaking socket connected', socket.id);
+      socket.emit('matchmaking:join');
+    });
+
+    socket.on('matchmaking:queued', (payload) => {
+      console.log('[dashboard] queued', payload);
+    });
+
+    socket.on('matchmaking:matched', async (payload) => {
+      console.log('[dashboard] matched', payload);
+      const sid = payload?.sessionId || payload?.roomId || '';
+      setMatchPartner(payload?.partner || null);
+      setSessionId(sid);
+
+      // auto-join inline
+      const userJson = localStorage.getItem('synclyUser');
+      let identity = null;
+      try {
+        const user = JSON.parse(userJson);
+        identity = {
+          userId: String(user?._id || '').trim(),
+          name: String(user?.fullName || user?.name || 'User').trim(),
+          image: user?.profileImage || ''
+        };
+      } catch {
+        identity = null;
+      }
+
+      if (identity && sid) {
+        void ensureSessionAndJoin({ identity, callId: sid, callType: 'video' });
+      }
+    });
+
+    socket.on('match-found', async (payload) => {
+      console.log('[dashboard] match-found', payload);
+      const sid = payload?.sessionId || payload?.roomId || '';
+      setMatchPartner(payload?.partner || null);
+      setSessionId(sid);
+
+      const userJson = localStorage.getItem('synclyUser');
+      let identity = null;
+      try {
+        const user = JSON.parse(userJson);
+        identity = {
+          userId: String(user?._id || '').trim(),
+          name: String(user?.fullName || user?.name || 'User').trim(),
+          image: user?.profileImage || ''
+        };
+      } catch {
+        identity = null;
+      }
+
+      if (identity && sid) {
+        void ensureSessionAndJoin({ identity, callId: sid, callType: 'video' });
+      }
+    });
+
+    socket.on('call:skipped', (payload) => {
+      console.log('[dashboard] call:skipped', payload);
+      // leave current call and requeue
+      void (async () => {
+        await leaveCall();
+        await disconnect();
+        setMatchPartner(null);
+        setSessionId('');
+        setIsSearching(true);
+        // rejoin queue after short delay
+        setTimeout(() => socket.emit('matchmaking:join'), 600);
+      })();
+    });
+
+    socket.on('call:cancelled', (payload) => {
+      console.log('[dashboard] call:cancelled', payload);
+      const initiator = payload?.initiator;
+      const userJson = localStorage.getItem('synclyUser');
+      let authUserId = '';
+      try {
+        authUserId = String(JSON.parse(userJson)?._id || '').trim();
+      } catch {
+        authUserId = '';
+      }
+
+      // if partner cancelled, requeue this user
+      if (initiator && initiator !== authUserId) {
+        void (async () => {
+          await leaveCall();
+          await disconnect();
+          setMatchPartner(null);
+          setSessionId('');
+          setIsSearching(true);
+          setTimeout(() => socket.emit('matchmaking:join'), 600);
+        })();
+      }
+    });
+
+    socket.on('matchmaking:error', (payload) => console.error('[dashboard] matchmaking:error', payload));
+
+    socket.on('disconnect', () => {
+      console.log('[dashboard] matchmaking socket disconnected');
+    });
   };
 
   const handleAddInterest = (value) => {
@@ -98,6 +214,43 @@ export default function DashboardPage() {
     });
   };
 
+  const handleStopSearching = async () => {
+    const socket = socketRef.current;
+    setIsSearching(false);
+    setMatchPartner(null);
+    setSessionId('');
+    try {
+      if (socket && socket.connected) {
+        socket.emit('matchmaking:leave');
+        socket.disconnect();
+      }
+    } catch (_) {}
+    socketRef.current = null;
+
+    try {
+      await leaveCall();
+      await disconnect();
+    } catch (_) {}
+  };
+
+  const handleSkip = async () => {
+    const socket = socketRef.current;
+    const sid = sessionId;
+    if (socket && sid) {
+      socket.emit('call:skip', { sessionId: sid });
+    }
+  };
+
+  const handleCancel = async () => {
+    const socket = socketRef.current;
+    const sid = sessionId;
+    if (socket && sid) {
+      socket.emit('call:cancel', { sessionId: sid });
+    }
+    // user leaves searching and returns to dashboard idle
+    await handleStopSearching();
+  };
+
   return (
     <main className="min-h-screen px-4 pb-6 pt-24 text-white sm:px-6 lg:px-10 lg:pt-28 lg:pb-8">
       <div className="pointer-events-none fixed inset-0 -z-10 bg-matte" />
@@ -114,13 +267,30 @@ export default function DashboardPage() {
               </div>
 
               <div className="flex flex-wrap gap-3">
-                <StartMatchButton onStart={handleStart} />
+                {!isSearching ? (
+                  <StartMatchButton onStart={handleStart} />
+                ) : (
+                  <>
+                    <ActionButton onClick={handleSkip} label="Skip" />
+                    <ActionButton onClick={handleCancel} label="Cancel" />
+                  </>
+                )}
               </div>
             </div>
 
             <div className="mt-6 grid gap-4 md:grid-cols-2">
-              <div className="flex min-h-[22rem] items-center justify-center overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#05080d] px-6 text-center text-white/75">
-                <p className="text-lg font-medium">Start matchmaking to connect with real users.</p>
+              <div className="flex min-h-[22rem] items-stretch justify-center overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#05080d] px-6 text-center text-white/75">
+                <CameraScreen title="Your camera" subtitle={isSearching ? 'Searching / Live' : 'Idle'} active={Boolean(isSearching || isInCall)}>
+                  {isInCall ? (
+                    <div className="h-full w-full p-4">
+                      <VideoRoom joining={status === 'joining'} status={status} isExitingCall={false} />
+                    </div>
+                  ) : (
+                    <div className="grid h-full place-items-center text-white/60">
+                      <p className="text-lg font-medium">{isSearching ? 'Searching for a match...' : 'Start matchmaking to connect with real users.'}</p>
+                    </div>
+                  )}
+                </CameraScreen>
               </div>
 
               <div className="flex min-h-[22rem] flex-col overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#05080d]">

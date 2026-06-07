@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import MatchHistory from '../models/MatchHistory.js';
 import { normalizeMatchProfile } from '../services/matchmakingService.js';
-import { createCallSession } from '../services/callService.js';
+import { createCallSession, endCallSession, getCallSessionById } from '../services/callService.js';
 
 class MatchmakingQueue {
   constructor(io) {
@@ -10,6 +10,86 @@ class MatchmakingQueue {
     this.queue = [];
     this.socketToUserId = new Map();
     this.isProcessingQueue = false;
+  }
+
+  async handleSkip(socket, sessionId) {
+    try {
+      const user = socket.data.user;
+      if (!user) {
+        socket.emit('matchmaking:error', { message: 'Authentication required for skip' });
+        return;
+      }
+
+      const session = await getCallSessionById(sessionId);
+      if (!session) {
+        socket.emit('matchmaking:error', { message: 'Call session not found' });
+        return;
+      }
+
+      const hostId = String(session.hostUser?._id || session.hostUser || '');
+      const participantId = String(session.participantUser?._id || session.participantUser || '');
+
+      // End the call session (authorized if requester is participant)
+      try {
+        await endCallSession({ sessionId, userId: user._id.toString() });
+      } catch (e) {
+        // Log but continue to notify participants
+        this.logError('endCallSession failed during skip', e);
+      }
+
+      // Notify both participants that the call was skipped
+      const payload = { sessionId, reason: 'skipped_by_peer', initiator: user._id.toString() };
+      if (hostId) this.io.to(`user:${hostId}`).emit('call:skipped', payload);
+      if (participantId) this.io.to(`user:${participantId}`).emit('call:skipped', payload);
+      console.log(`[matchmaking] session ${sessionId} skipped by user ${user._id.toString()}`);
+    } catch (error) {
+      this.logError('handleSkip failure', error);
+      socket.emit('matchmaking:error', { message: 'Failed to process skip request' });
+    }
+  }
+
+  async handleCancel(socket, sessionId) {
+    try {
+      const user = socket.data.user;
+      if (!user) {
+        socket.emit('matchmaking:error', { message: 'Authentication required for cancel' });
+        return;
+      }
+
+      const session = await getCallSessionById(sessionId);
+      if (!session) {
+        socket.emit('matchmaking:error', { message: 'Call session not found' });
+        return;
+      }
+
+      const hostId = String(session.hostUser?._id || session.hostUser || '');
+      const participantId = String(session.participantUser?._id || session.participantUser || '');
+
+      // End the call session
+      try {
+        await endCallSession({ sessionId, userId: user._id.toString() });
+      } catch (e) {
+        this.logError('endCallSession failed during cancel', e);
+      }
+
+      // Notify the other participant that their partner cancelled and should be requeued
+      const initiatorId = user._id.toString();
+      const otherId = initiatorId === hostId ? participantId : hostId;
+      if (otherId) {
+        this.io.to(`user:${otherId}`).emit('call:cancelled', {
+          sessionId,
+          reason: 'partner_cancelled',
+          initiator: initiatorId
+        });
+      }
+
+      // Also notify initiator for completeness
+      this.io.to(`user:${initiatorId}`).emit('call:cancel_ack', { sessionId, reason: 'cancelled' });
+      console.log(`[matchmaking] session ${sessionId} cancelled by user ${initiatorId}`);
+    } catch (error) {
+      this.logError('handleCancel failure', error);
+      socket.emit('matchmaking:error', { message: 'Failed to process cancel request' });
+    }
   }
 
   static parseCookies(cookieHeader = '') {
@@ -421,6 +501,38 @@ export function initializeMatchmaking(io) {
 
     socket.on('matchmaking:leave', () => {
       matchmakingQueue.leaveQueue(socket);
+    });
+
+    socket.on('call:skip', async (payload) => {
+      const user = socket.data.user || (await authPromise.catch(() => null));
+      if (!user) {
+        socket.emit('matchmaking:error', { message: 'Authentication required' });
+        return;
+      }
+
+      const sessionId = payload?.sessionId || payload?.callId;
+      if (!sessionId) {
+        socket.emit('matchmaking:error', { message: 'sessionId is required for skip' });
+        return;
+      }
+
+      await matchmakingQueue.handleSkip(socket, sessionId);
+    });
+
+    socket.on('call:cancel', async (payload) => {
+      const user = socket.data.user || (await authPromise.catch(() => null));
+      if (!user) {
+        socket.emit('matchmaking:error', { message: 'Authentication required' });
+        return;
+      }
+
+      const sessionId = payload?.sessionId || payload?.callId;
+      if (!sessionId) {
+        socket.emit('matchmaking:error', { message: 'sessionId is required for cancel' });
+        return;
+      }
+
+      await matchmakingQueue.handleCancel(socket, sessionId);
     });
 
     socket.on('disconnect', () => {

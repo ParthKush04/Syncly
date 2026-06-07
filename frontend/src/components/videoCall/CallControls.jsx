@@ -90,6 +90,10 @@ export default function CallControls({ onSkip, onLeave, isBusy = false }) {
         <CameraIcon off={isCameraMuted} />
       </IconButton>
 
+      <IconButton label="Skip" active={false} onClick={onSkip} disabled={isBusy}>
+        <SkipIcon />
+      </IconButton>
+
       <button
         type="button"
         onClick={onLeave}
@@ -98,6 +102,15 @@ export default function CallControls({ onSkip, onLeave, isBusy = false }) {
       >
         <LeaveIcon />
         <span className="hidden sm:inline">{isBusy ? 'Processing...' : 'Leave'}</span>
+      </button>
+
+      <button
+        type="button"
+        onClick={onLeave}
+        disabled={isBusy}
+        className="hidden sm:inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        Cancel
       </button>
     </div>
   );
