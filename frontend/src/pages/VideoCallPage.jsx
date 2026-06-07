@@ -34,10 +34,11 @@ export default function VideoCallPage() {
         return undefined;
       }
 
+      const rawImage = String(user.profileImage || user.photoUrl || '').trim();
       const identity = {
         userId: authUserId,
         name: String(user.fullName || user.name || 'User').trim(),
-        image: String(user.profileImage || user.photoUrl || '').trim()
+        image: rawImage && !rawImage.startsWith('data:') && rawImage.length <= 2048 ? rawImage : ''
       };
 
       const joinKey = `${identity.userId}:${callType}:${callId}`;

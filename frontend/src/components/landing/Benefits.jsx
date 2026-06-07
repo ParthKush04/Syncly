@@ -1,19 +1,23 @@
 const benefits = [
   {
     title: 'Verified professionals',
-    text: 'Reduce noise and fake profiles with LinkedIn verification and trust-first onboarding.'
+    text: 'Reduce noise and fake profiles with LinkedIn verification and trust-first onboarding.',
+    image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80'
   },
   {
     title: 'High-fit matchmaking',
-    text: 'Prioritize overlapping interests, shared goals, and compatible experience levels.'
+    text: 'Prioritize overlapping interests, shared goals, and compatible experience levels.',
+    image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80'
   },
   {
     title: 'Real-time conversations',
-    text: 'Move from discovery into live one-on-one audio and video calls without friction.'
+    text: 'Move from discovery into live one-on-one audio and video calls without friction.',
+    image: 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=800&q=80'
   },
   {
     title: 'Premium networking flows',
-    text: 'Designed for founders, operators, creators, and ambitious professionals who value quality.'
+    text: 'Designed for founders, operators, creators, and ambitious professionals who value quality.',
+    image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80'
   }
 ];
 
@@ -35,12 +39,24 @@ export default function Benefits() {
           {benefits.map((benefit) => (
             <article
               key={benefit.title}
-              className="rounded-[1.75rem] border border-white/12 bg-white/10 p-6 shadow-sm backdrop-blur-md"
+              className="overflow-hidden rounded-[1.75rem] border border-white/12 bg-white/10 shadow-sm backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
             >
-              <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-sky-400 via-fuchsia-400 to-violet-500" />
-                            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-sky-400 via-fuchsia-400 to-violet-500" />
-              <h3 className="mt-5 text-xl font-semibold text-white">{benefit.title}</h3>
-              <p className="mt-3 text-sm leading-7 text-white/72">{benefit.text}</p>
+              <div className="relative h-48 overflow-hidden bg-slate-900">
+                <img
+                  src={benefit.image}
+                  alt={benefit.title}
+                  className="h-full w-full object-cover transition duration-500 hover:scale-105"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
+              </div>
+              <div className="space-y-4 p-6">
+                <h3 className="text-xl font-semibold text-white">{benefit.title}</h3>
+                <p className="text-sm leading-7 text-white/75">{benefit.text}</p>
+                <div className="inline-flex rounded-full border border-white/12 bg-white/10 px-3 py-1 text-xs font-semibold text-white/75">
+                  Professional insight
+                </div>
+              </div>
             </article>
           ))}
         </div>

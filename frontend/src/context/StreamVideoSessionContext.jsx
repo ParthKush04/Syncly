@@ -6,6 +6,21 @@ const StreamVideoSessionContext = createContext(null);
 
 const API_KEY = import.meta.env.VITE_STREAM_API_KEY;
 const DEFAULT_CALL_TYPE = import.meta.env.VITE_STREAM_DEFAULT_CALL_TYPE || 'default';
+const MAX_SAFE_STREAM_IMAGE_LENGTH = 2048;
+
+function sanitizeStreamImage(rawImage) {
+  const image = String(rawImage || '').trim();
+  if (!image) {
+    return '';
+  }
+  if (image.startsWith('data:')) {
+    return '';
+  }
+  if (image.length > MAX_SAFE_STREAM_IMAGE_LENGTH) {
+    return '';
+  }
+  return image;
+}
 
 export function StreamVideoSessionProvider({ children }) {
   const [client, setClient] = useState(() => getCurrentStreamClient());
@@ -154,10 +169,13 @@ export function StreamVideoSessionProvider({ children }) {
       setError('');
 
       try {
+        const rawImage = nextIdentity?.image || authState.user?.profileImage || '';
+        const safeImage = sanitizeStreamImage(rawImage);
+
         const user = {
           id: userId,
           name,
-          image: nextIdentity?.image || authState.user?.profileImage || ''
+          ...(safeImage ? { image: safeImage } : {})
         };
 
         const tokenProvider = async () => {

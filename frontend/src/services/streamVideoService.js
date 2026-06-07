@@ -1,5 +1,13 @@
 const STREAM_TOKEN_ENDPOINT = import.meta.env.VITE_STREAM_TOKEN_ENDPOINT;
 
+function sanitizeStreamImage(rawImage) {
+  const image = String(rawImage || '').trim();
+  if (!image || image.startsWith('data:') || image.length > 2048) {
+    return '';
+  }
+  return image;
+}
+
 export async function fetchStreamToken(user, authToken = '') {
   if (!STREAM_TOKEN_ENDPOINT) {
     throw new Error('VITE_STREAM_TOKEN_ENDPOINT is not configured');
@@ -30,7 +38,7 @@ export async function fetchStreamToken(user, authToken = '') {
     body: JSON.stringify({
       userId,
       name: user.name,
-      image: user.image || ''
+      image: sanitizeStreamImage(user.image)
     })
   });
 
