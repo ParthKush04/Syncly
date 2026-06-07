@@ -94,17 +94,14 @@ function VideoFrame({
 
   const initials = getInitials(name);
 
-  const sizeClass =
-    size === 'preview'
-      ? 'aspect-[4/5] w-full min-h-[11rem] sm:aspect-video sm:min-h-[13rem] md:min-h-[15rem]'
-      : 'aspect-[4/5] w-full min-h-[16rem] sm:aspect-video sm:min-h-[24rem] md:min-h-[30rem] lg:min-h-[36rem]';
+ const sizeClass = 'h-full w-full';
 
   return (
-    <div
-      className={`relative overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950 shadow-2xl shadow-black/40 ${sizeClass} ${
-        overlay ? 'ring-1 ring-white/10' : ''
-      }`}
-    >
+   <div
+  className={`relative h-full w-full overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950 shadow-2xl shadow-black/40 ${
+    overlay ? 'ring-1 ring-white/10' : ''
+  }`}
+>
       {/* Always mount ParticipantView so Stream can attach video/audio tracks. */}
       {participant ? (
         <ParticipantView
@@ -180,8 +177,8 @@ function TwoPersonLayout({
   selfParticipant
 }) {
   return (
-    <div className="grid h-full w-full grid-cols-1 gap-3 md:grid-cols-2 lg:gap-4 items-stretch">
-      <div className="min-h-0">
+    <div className="grid h-full w-full grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="h-full min-h-0">
         <VideoFrame
           participant={primaryParticipant}
           label={primaryParticipant ? 'Connected' : 'Waiting'}
@@ -190,24 +187,14 @@ function TwoPersonLayout({
         />
       </div>
 
-      <div className="min-h-0">
-        {selfParticipant ? (
-          <VideoFrame
-            participant={selfParticipant}
-            label="You"
-            size="hero"
-            overlay
-            mirror
-          />
-        ) : (
-          <VideoFrame
-            participant={null}
-            label="You"
-            size="hero"
-            overlay
-            mirror
-          />
-        )}
+      <div className="h-full min-h-0">
+        <VideoFrame
+          participant={selfParticipant}
+          label="You"
+          size="hero"
+          overlay
+          mirror
+        />
       </div>
     </div>
   );
@@ -232,14 +219,14 @@ function StageContent({
     );
   }
 
-  return (
-    <div className={isMobile ? 'flex flex-col gap-3' : ''}>
-      <TwoPersonLayout
-        primaryParticipant={primaryParticipant}
-        selfParticipant={selfParticipant}
-      />
-    </div>
-  );
+ return (
+  <div className="h-full w-full">
+    <TwoPersonLayout
+      primaryParticipant={primaryParticipant}
+      selfParticipant={selfParticipant}
+    />
+  </div>
+);
 }
 
 function VideoStage({
@@ -309,7 +296,7 @@ function VideoStage({
         </div>
       ) : null}
 
-      <div className="relative min-h-0 flex-1">
+      <div className="relative h-full min-h-0 flex-1">
         <StageContent
           participants={participants}
           primaryParticipant={primaryParticipant}
@@ -362,8 +349,8 @@ export default function VideoRoom({
                     <CallControls onSkip={onSkip} onLeave={onLeave} isBusy={isExitingCall} />
                   </div>
 
-                  <div className="min-h-0 flex-1">
-                    <VideoStage
+                  <div className="flex-1 min-h-0 h-full w-full">
+  <VideoStage
                       onJoin={onJoin}
                       joining={joining}
                       status={status}
