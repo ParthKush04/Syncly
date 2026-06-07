@@ -188,77 +188,132 @@ export default function MatchmakingWaitPage() {
 
   return (
     <main className="min-h-screen px-4 py-8 text-white sm:px-6 lg:px-10 lg:py-10">
-      <div className="mx-auto w-full">
-        {/* Two equal-width panels: Camera (left) and Waiting (right) */}
-        <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch min-h-[65vh]">
-          {/* Left camera panel */}
-          <section className="rounded-[2rem] card-dark-strong shadow-2xl shadow-black/30 w-full flex flex-col h-full overflow-hidden">
-            <div className="flex-1 min-h-0 w-full">
-              <div className="h-full w-full overflow-hidden bg-slate-950/80 flex items-center justify-center rounded-[2rem]">
-                {/* Video/image should fill available space */}
-                {matchPartner ? (
-                  <div className="w-full h-full flex flex-col items-center justify-center gap-4 px-6 py-4">
-                    <img
-                      src={matchPartner.profileImage}
-                      alt={matchPartner.fullName || matchPartner.name || 'Matched professional'}
-                      className="max-h-36 h-36 w-36 rounded-full object-cover shadow-2xl"
-                    />
-                    <div className="text-center w-full">
-                      <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">Match found</p>
-                      <p className="mt-3 text-2xl font-semibold text-white">{matchPartner.fullName || matchPartner.name || 'A verified professional'}</p>
-                      {matchPartner.profession ? <p className="mt-2 text-sm text-white/70">{matchPartner.profession}</p> : null}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center px-6 py-4">
-                    <div className="flex-1 w-full flex items-center justify-center">
-                      <SearchingOrb />
-                    </div>
-                    <p className="text-sm uppercase tracking-[0.45em] text-white/80 mt-4">Searching</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
+  <div className="w-full max-w-none">
+    <div className="grid w-full grid-cols-1 lg:grid-cols-2 gap-6 h-[75vh]">
 
-          {/* Right waiting panel */}
-          <section className="rounded-[2rem] card-dark p-6 shadow-lg shadow-black/25 w-full flex flex-col h-full">
-            <div className="flex items-center justify-between border-b border-white/10 px-1 pb-3">
-              <div>
-                <p className="text-sm font-semibold text-white">Waiting for a real user</p>
-                <p className="mt-1 text-xs uppercase tracking-[0.25em] text-white/55">No match yet</p>
-              </div>
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/75">Real only</span>
-            </div>
+      {/* Left Panel */}
+      <section className="rounded-[2rem] card-dark-strong shadow-2xl shadow-black/30 w-full min-w-0 flex flex-col overflow-hidden">
+        <div className="flex-1 min-h-0 h-full w-full">
+          <div className="h-full w-full overflow-hidden bg-slate-950/80 flex items-center justify-center rounded-[2rem]">
 
-            <div className="flex-1 grid place-items-center px-6 text-center text-white/60">
-              <div>
-                <div className="mb-4">
+            {matchPartner ? (
+              <div className="w-full h-full flex flex-col items-center justify-center gap-4 px-6 py-4">
+                <img
+                  src={matchPartner.profileImage}
+                  alt={matchPartner.fullName || matchPartner.name || 'Matched professional'}
+                  className="h-36 w-36 rounded-full object-cover shadow-2xl"
+                />
+
+                <div className="text-center w-full">
+                  <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">
+                    Match found
+                  </p>
+
+                  <p className="mt-3 text-2xl font-semibold text-white">
+                    {matchPartner.fullName ||
+                      matchPartner.name ||
+                      'A verified professional'}
+                  </p>
+
+                  {matchPartner.profession ? (
+                    <p className="mt-2 text-sm text-white/70">
+                      {matchPartner.profession}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center px-6 py-4">
+                <div className="flex-1 min-h-[450px] w-full flex items-center justify-center">
                   <SearchingOrb />
                 </div>
-                <p className="text-base font-medium text-white/75">You will only connect once another verified user is also in the matchmaking queue.</p>
-                <p className="mt-2 text-sm leading-6 text-white/55">If no user is available yet, we keep searching and do not connect until the match is real.</p>
-              </div>
-            </div>
 
-            <div className="mt-6 w-full">
-              <div className="grid gap-6">
-                <div>
-                  <h3 className="text-sm uppercase tracking-[0.35em] text-cyan-300">Matching preferences</h3>
-                  <div className="mt-3">
-                    <PreferenceChip label="Interests" value={interests.length > 0 ? interests.join(', ') : 'No interests set yet'} />
-                  </div>
-                </div>
-
-                <div className="rounded-[1rem] card-dark-strong p-4">
-                  <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">Queue controls</p>
-                  <p className="mt-3 text-sm leading-7 text-white/75">You can leave the matchmaking queue at any time and return when you’re ready to connect again.</p>
-                  <button type="button" onClick={() => navigate('/dashboard')} className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-rose-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-rose-400">Cancel matchmaking</button>
-                </div>
+                <p className="mt-4 text-sm uppercase tracking-[0.45em] text-white/80">
+                  Searching
+                </p>
               </div>
-            </div>
-          </section>
+            )}
+          </div>
         </div>
+      </section>
+
+      {/* Right Panel */}
+      <section className="rounded-[2rem] card-dark p-6 shadow-lg shadow-black/25 w-full min-w-0 flex flex-col overflow-hidden">
+        <div className="flex items-center justify-between border-b border-white/10 px-1 pb-3">
+          <div>
+            <p className="text-sm font-semibold text-white">
+              Waiting for a real user
+            </p>
+
+            <p className="mt-1 text-xs uppercase tracking-[0.25em] text-white/55">
+              No match yet
+            </p>
+          </div>
+
+          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/75">
+            Real only
+          </span>
+        </div>
+
+        <div className="flex-1 flex items-center justify-center px-6 text-center text-white/60">
+          <div className="w-full">
+            <div className="mb-4 flex justify-center">
+              <SearchingOrb />
+            </div>
+
+            <p className="text-base font-medium text-white/75">
+              You will only connect once another verified user is also in the matchmaking queue.
+            </p>
+
+            <p className="mt-2 text-sm leading-6 text-white/55">
+              If no user is available yet, we keep searching and do not connect until the match is real.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 w-full">
+          <div className="grid gap-6">
+
+            <div>
+              <h3 className="text-sm uppercase tracking-[0.35em] text-cyan-300">
+                Matching preferences
+              </h3>
+
+              <div className="mt-3">
+                <PreferenceChip
+                  label="Interests"
+                  value={
+                    interests.length > 0
+                      ? interests.join(', ')
+                      : 'No interests set yet'
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="rounded-[1rem] card-dark-strong p-4">
+              <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">
+                Queue controls
+              </p>
+
+              <p className="mt-3 text-sm leading-7 text-white/75">
+                You can leave the matchmaking queue at any time and return when you're ready to connect again.
+              </p>
+
+              <button
+                type="button"
+                onClick={() => navigate('/dashboard')}
+                className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-rose-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-rose-400"
+              >
+                Cancel matchmaking
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+    </div>
 
         <div className="mt-6 rounded-3xl card-dark p-5 w-full">
           <div className="flex items-center justify-between gap-4 text-sm text-white/80">
