@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Logo from '../components/branding/Logo.jsx';
 import SearchingOrb from '../components/matchmaking/SearchingOrb.jsx';
 import StatusCard from '../components/matchmaking/StatusCard.jsx';
 import PreferenceChip from '../components/matchmaking/PreferenceChip.jsx';
@@ -193,14 +192,9 @@ export default function MatchmakingWaitPage() {
         {/* Two equal-width panels: Camera (left) and Waiting (right) */}
         <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch min-h-[65vh]">
           {/* Left camera panel */}
-          <section className="rounded-[2rem] card-dark-strong p-6 shadow-2xl shadow-black/30 sm:p-8 w-full flex flex-col h-full">
-            <div className="flex items-center justify-between">
-              <Logo compact className="mb-0" tone="light" />
-              <div className="rounded-full border border-emerald-100 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">Active</div>
-            </div>
-
-            <div className="mt-6 flex-1 flex flex-col w-full">
-              <div className="flex-1 w-full overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/80 flex items-center justify-center min-h-[22rem]">
+          <section className="rounded-[2rem] card-dark-strong shadow-2xl shadow-black/30 w-full flex flex-col h-full overflow-hidden">
+            <div className="flex-1 min-h-0 w-full">
+              <div className="h-full w-full overflow-hidden bg-slate-950/80 flex items-center justify-center rounded-[2rem]">
                 {/* Video/image should fill available space */}
                 {matchPartner ? (
                   <div className="w-full h-full flex flex-col items-center justify-center gap-4 px-6 py-4">
@@ -223,18 +217,6 @@ export default function MatchmakingWaitPage() {
                     <p className="text-sm uppercase tracking-[0.45em] text-white/80 mt-4">Searching</p>
                   </div>
                 )}
-              </div>
-
-              <div className="mt-6 rounded-3xl card-dark p-5 w-full">
-                <div className="flex items-center justify-between gap-4 text-sm text-white/80">
-                  <span>{errorMessage || statusMessage || progressMessages[messageIndex]}</span>
-                  <span>{progress}%</span>
-                </div>
-                <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/6">
-                  <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-700" style={{ width: `${progress}%` }} />
-                </div>
-                {queueSize !== null ? <p className="mt-3 text-xs uppercase tracking-[0.3em] text-white/60">Queue size: {queueSize}</p> : null}
-                {matchPartner ? <p className="mt-3 text-sm font-medium text-emerald-300">Matched with {matchPartner?.fullName || 'a professional'}</p> : null}
               </div>
             </div>
           </section>
@@ -276,6 +258,18 @@ export default function MatchmakingWaitPage() {
               </div>
             </div>
           </section>
+        </div>
+
+        <div className="mt-6 rounded-3xl card-dark p-5 w-full">
+          <div className="flex items-center justify-between gap-4 text-sm text-white/80">
+            <span>{errorMessage || statusMessage || progressMessages[messageIndex]}</span>
+            <span>{progress}%</span>
+          </div>
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/6">
+            <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-700" style={{ width: `${progress}%` }} />
+          </div>
+          {queueSize !== null ? <p className="mt-3 text-xs uppercase tracking-[0.3em] text-white/60">Queue size: {queueSize}</p> : null}
+          {matchPartner ? <p className="mt-3 text-sm font-medium text-emerald-300">Matched with {matchPartner?.fullName || 'a professional'}</p> : null}
         </div>
       </div>
     </main>
